@@ -1,0 +1,109 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+  Vigia roda permanentemente em modo escuro (Design System V2, secao 2.1) —
+  nao existe variante clara hoje. Os valores abaixo sao os tokens reais da doc,
+  mapeados direto nas variaveis que os componentes shadcn esperam encontrar.
+  Ver docs/VIGIA_DESIGN_SYSTEM_V2.md.
+*/
+:root {
+  color-scheme: dark;
+
+  --background: #0a0a0b;
+  --foreground: #f4f4f3;
+  --card: #0a0a0b;
+  --card-foreground: #f4f4f3;
+  --popover: #15110f;
+  --popover-foreground: #f4f4f3;
+  --primary: #f4f4f3;
+  --primary-foreground: #0a0a0b;
+  --secondary: #1c1c1e;
+  --secondary-foreground: #f4f4f3;
+  --muted: #1c1c1e;
+  --muted-foreground: #9c9c9f;
+  --accent: #1c1c1e;
+  --accent-foreground: #f4f4f3;
+  --destructive: #e24b4a;
+  --destructive-foreground: #f4f4f3;
+  --border: rgba(255, 255, 255, 0.08);
+  --input: rgba(255, 255, 255, 0.12);
+  --ring: rgba(255, 255, 255, 0.2);
+  --radius: 0.5rem;
+
+  /* Tokens de status — a unica cor que existe na interface (secao 2.2) */
+  --color-status-critico: #e24b4a;
+  --color-status-critico-texto: #e89593;
+  --color-status-atencao: #d9a441;
+  --color-status-bom: #5ba85a;
+  --color-status-bom-texto: #7fb87a;
+  --color-status-neutro: #6b6b6e;
+
+  /* Escala de texto (secao 2.1) — alem de foreground/muted-foreground do shadcn */
+  --color-text-terciario: #9c9c9f;
+  --color-text-quaternario: #6b6b6e;
+
+  --color-border-subtle: rgba(255, 255, 255, 0.06);
+}
+
+@theme inline {
+  --font-sans: 'Inter', system-ui, sans-serif;
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --color-status-critico: var(--color-status-critico);
+  --color-status-critico-texto: var(--color-status-critico-texto);
+  --color-status-atencao: var(--color-status-atencao);
+  --color-status-bom: var(--color-status-bom);
+  --color-status-bom-texto: var(--color-status-bom-texto);
+  --color-status-neutro: var(--color-status-neutro);
+
+  --color-text-terciario: var(--color-text-terciario);
+  --color-text-quaternario: var(--color-text-quaternario);
+  --color-border-subtle: var(--color-border-subtle);
+
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  html {
+    @apply font-sans;
+  }
+}
+
+#root {
+  min-height: 100svh;
+}
