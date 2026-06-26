@@ -1,0 +1,301 @@
+// Schema do MVP mínimo viável (blocos 1-7).
+// Entidades de M3/M5/M6/IA (Diagnostico, Relatorio, UsoIa) ficam fora por ora —
+// ver docs/VIGIA_DIAGRAMA_FISICO.md secao 3 quando entrarem em planejamento.
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Papel {
+  dono
+  operador
+  visualizador
+}
+
+enum StatusProjeto {
+  conectado
+  aviso_cobranca
+  desconectado
+}
+
+enum Objetivo {
+  lead
+  venda
+  mensagens
+  reconhecimento
+}
+
+enum TipoOrcamento {
+  CBO
+  ABO
+}
+
+enum StatusCampanha {
+  ativa
+  aprendendo
+  pausada_ia
+  pausada_user
+  arquivada
+}
+
+enum TipoCriativo {
+  video
+  imagem
+  carrossel
+}
+
+enum EstadoCriativo {
+  ativo
+  fadiga
+  pausado
+}
+
+enum Severidade {
+  critico
+  atencao
+  info
+}
+
+enum OrigemAlerta {
+  monitoramento
+  governanca
+}
+
+enum StatusAlerta {
+  aberto
+  resolvido
+  ignorado
+}
+
+enum TipoAprovacao {
+  publicar
+  escalar_verba
+  criar_publico
+  pausar
+}
+
+enum OrigemAprovacao {
+  diagnostico
+  sistema
+}
+
+enum Autonomia {
+  autonoma
+  assistida
+  vedada
+}
+
+enum StatusAprovacao {
+  pendente
+  aprovado
+  ignorado
+  executado
+  falhou
+}
+
+model Organizacao {
+  id                     String   @id @default(uuid())
+  nome                   String
+  plano                  String   @default("interno")
+  limiteAnalisesIaMes    Int      @default(0) @map("limite_analises_ia_mes")
+  analisesIaConsumidas   Int      @default(0) @map("analises_ia_consumidas")
+  createdAt              DateTime @default(now()) @map("created_at")
+
+  usuarios               Usuario[]
+  projetos               Projeto[]
+  aprovacoes             Aprovacao[]
+  registrosAuditoria     RegistroAuditoria[]
+
+  @@map("organizacao")
+}
+
+model Usuario {
+  id            String   @id @default(uuid())
+  organizacaoId String   @map("organizacao_id")
+  nome          String
+  email         String   @unique
+  senhaHash     String   @map("senha_hash")
+  papel         Papel
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  organizacao        Organizacao @relation(fields: [organizacaoId], references: [id])
+  aprovacoesDecididas Aprovacao[] @relation("DecididoPor")
+
+  @@map("usuario")
+}
+
+model Projeto {
+  id              String         @id @default(uuid())
+  organizacaoId   String         @map("organizacao_id")
+  clienteNome     String         @map("cliente_nome")
+  nicho           String
+  ticketMedio     Decimal        @map("ticket_medio")
+  metaExternalId  String         @map("meta_external_id")
+  tokenRef        String         @map("token_ref")
+  status          StatusProjeto  @default(conectado)
+  createdAt       DateTime       @default(now()) @map("created_at")
+
+  organizacao     Organizacao     @relation(fields: [organizacaoId], references: [id])
+  limiteSeguranca LimiteSeguranca?
+  campanhas       Campanha[]
+
+  @@map("projeto")
+}
+
+model Campanha {
+  id             String         @id @default(uuid())
+  projetoId      String         @map("projeto_id")
+  nome           String
+  objetivo       Objetivo
+  tipoOrcamento  TipoOrcamento  @map("tipo_orcamento")
+  verbaDiaria    Decimal        @map("verba_diaria")
+  status         StatusCampanha @default(pausada_user)
+  metaExternalId String         @map("meta_external_id")
+  createdAt      DateTime       @default(now()) @map("created_at")
+
+  projeto        Projeto         @relation(fields: [projetoId], references: [id])
+  conjuntos      Conjunto[]
+  metricasDiarias MetricaDiaria[]
+  alertas        Alerta[]
+
+  @@map("campanha")
+}
+
+model Conjunto {
+  id             String  @id @default(uuid())
+  campanhaId     String  @map("campanha_id")
+  nome           String
+  verba          Decimal?
+  status         String?
+  metaExternalId String  @map("meta_external_id")
+
+  campanha       Campanha  @relation(fields: [campanhaId], references: [id])
+  criativos      Criativo[]
+
+  @@map("conjunto")
+}
+
+model Criativo {
+  id             String         @id @default(uuid())
+  conjuntoId     String         @map("conjunto_id")
+  tipo           TipoCriativo
+  formato        String
+  estado         EstadoCriativo @default(ativo)
+  metaExternalId String         @map("meta_external_id")
+
+  conjunto       Conjunto @relation(fields: [conjuntoId], references: [id])
+
+  @@map("criativo")
+}
+
+model MetricaDiaria {
+  id           String   @id @default(uuid())
+  campanhaId   String   @map("campanha_id")
+  data         DateTime @db.Date
+  impressoes   BigInt
+  cliques      BigInt
+  leads        BigInt
+  compras      BigInt
+  investimento Decimal
+  receita      Decimal
+  cpl          Decimal?
+  cpa          Decimal?
+  roas         Decimal?
+  ctr          Decimal?
+  frequencia   Decimal?
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  campanha     Campanha @relation(fields: [campanhaId], references: [id])
+
+  @@index([campanhaId, data])
+  @@map("metrica_diaria")
+}
+
+model Benchmark {
+  id          String  @id @default(uuid())
+  nicho       String
+  tipoFunil   String  @map("tipo_funil")
+  ticketRange String  @map("ticket_range")
+  kpi         String
+  valorRuim   Decimal @map("valor_ruim")
+  valorMedio  Decimal @map("valor_medio")
+  valorBom    Decimal @map("valor_bom")
+  fonte       String
+  ano         Int
+
+  @@map("benchmark")
+}
+
+model LimiteSeguranca {
+  id                 String  @id @default(uuid())
+  projetoId          String  @unique @map("projeto_id")
+  tetoVerbaDiaria    Decimal @map("teto_verba_diaria")
+  cplMaximo          Decimal @map("cpl_maximo")
+  escalaMaxPctDia    Int     @default(20) @map("escala_max_pct_dia")
+
+  projeto            Projeto @relation(fields: [projetoId], references: [id])
+
+  @@map("limite_seguranca")
+}
+
+model Alerta {
+  id              String       @id @default(uuid())
+  campanhaId      String       @map("campanha_id")
+  severidade      Severidade
+  kpi             String
+  valorAtual      Decimal      @map("valor_atual")
+  valorBenchmark  Decimal      @map("valor_benchmark")
+  desvioPct       Decimal      @map("desvio_pct")
+  titulo          String
+  descricao       String
+  foraDoAlcanceIa Boolean      @default(false) @map("fora_do_alcance_ia")
+  origem          OrigemAlerta
+  status          StatusAlerta @default(aberto)
+  createdAt       DateTime     @default(now()) @map("created_at")
+
+  campanha        Campanha @relation(fields: [campanhaId], references: [id])
+
+  @@map("alerta")
+}
+
+model Aprovacao {
+  id            String          @id @default(uuid())
+  organizacaoId String          @map("organizacao_id")
+  tipo          TipoAprovacao
+  alvoRef       String          @map("alvo_ref")
+  descricao     String
+  gatilho       Json
+  origem        OrigemAprovacao
+  autonomia     Autonomia
+  status        StatusAprovacao @default(pendente)
+  decididoPor   String?         @map("decidido_por")
+  decididoEm    DateTime?       @map("decidido_em")
+  createdAt     DateTime        @default(now()) @map("created_at")
+
+  organizacao   Organizacao @relation(fields: [organizacaoId], references: [id])
+  decisor       Usuario?    @relation("DecididoPor", fields: [decididoPor], references: [id])
+
+  @@map("aprovacao")
+}
+
+model RegistroAuditoria {
+  id            String   @id @default(uuid())
+  organizacaoId String   @map("organizacao_id")
+  ator          String
+  acao          String
+  alvoRef       String?  @map("alvo_ref")
+  dadosAntes    Json?    @map("dados_antes")
+  dadosDepois   Json?    @map("dados_depois")
+  gatilho       Json?
+  timestamp     DateTime @default(now())
+
+  organizacao   Organizacao @relation(fields: [organizacaoId], references: [id])
+
+  @@map("registro_auditoria")
+}
