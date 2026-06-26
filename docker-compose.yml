@@ -1,0 +1,37 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: vigia-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-vigia}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-vigia}
+      POSTGRES_DB: ${POSTGRES_DB:-vigia}
+    ports:
+      - '${POSTGRES_PORT:-5432}:5432'
+    volumes:
+      - vigia_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER:-vigia}']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: vigia-pgadmin
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-admin@vigia.local}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-vigia}
+    ports:
+      - '${PGADMIN_PORT:-5050}:80'
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - vigia_pgadmin_data:/var/lib/pgadmin
+
+volumes:
+  vigia_postgres_data:
+  vigia_pgadmin_data:
