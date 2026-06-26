@@ -1,6 +1,6 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { Papel } from '../../../generated/prisma';
+import { Papel } from '@prisma/client';
 import { ROLES_KEY } from '../decorators/roles.decorator';
 
 @Injectable()

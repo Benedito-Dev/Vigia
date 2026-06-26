@@ -1,5 +1,5 @@
 import { IsEnum, IsNotEmpty, IsNumber, IsString, Min } from 'class-validator';
-import { Objetivo, TipoOrcamento } from '../../../generated/prisma';
+import { Objetivo, TipoOrcamento } from '@prisma/client';
 
 export class CriarCampanhaDto {
   @IsString()

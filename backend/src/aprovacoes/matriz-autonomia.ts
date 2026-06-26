@@ -1,4 +1,4 @@
-import { Autonomia } from '../../generated/prisma';
+import { Autonomia } from '@prisma/client';
 
 /**
  * Classifica uma ação do sistema conforme a matriz de autonomia
