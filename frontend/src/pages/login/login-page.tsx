@@ -1,9 +1,10 @@
 import { useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { TrendingUp, ShieldCheck, Zap } from 'lucide-react'
+import { TrendingUp, Zap, Mail, Lock, Eye, EyeOff } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { LinhaStatus } from '@/components/shared/linha-status'
+import { VigiaLogo } from '@/components/shared/vigia-logo'
 import { useLogin, extrairMensagemDeErro } from '@/features/auth/use-login'
 
 export function LoginPage() {
@@ -11,6 +12,7 @@ export function LoginPage() {
   const login = useLogin()
   const [email, setEmail] = useState('')
   const [senha, setSenha] = useState('')
+  const [mostrarSenha, setMostrarSenha] = useState(false)
 
   function handleSubmit(event: FormEvent) {
     event.preventDefault()
@@ -22,50 +24,45 @@ export function LoginPage() {
 
   return (
     <div className="relative grid min-h-svh lg:grid-cols-2">
-      {/* Logo fixa no canto superior esquerdo da tela */}
-      <div className="absolute left-6 top-6 z-20 flex items-center gap-2 lg:left-10 lg:top-10">
-        <div className="flex size-9 items-center justify-center rounded-lg bg-gradient-to-br from-emerald-400 to-cyan-500">
-          <ShieldCheck className="size-5 text-black" strokeWidth={2.5} />
-        </div>
-        <span className="text-base font-semibold tracking-wide text-white">
-          VIGIA
-        </span>
-      </div>
-
       {/* Coluna de vitrine — mockup vivo do produto */}
-      <div className="relative hidden overflow-hidden bg-gradient-to-br from-[#0b3b34] via-[#0a2e3d] to-[#0a1f3d] lg:flex lg:flex-col lg:justify-center lg:px-20">
+      <div className="relative hidden overflow-hidden bg-[#0a0a0b] lg:flex lg:flex-col lg:justify-center lg:px-20">
         <div
           aria-hidden
           className="pointer-events-none absolute inset-0"
           style={{
             backgroundImage:
-              'radial-gradient(circle at 15% 15%, rgba(52,211,153,0.55), transparent 45%), radial-gradient(circle at 85% 75%, rgba(34,211,238,0.45), transparent 50%), radial-gradient(circle at 50% 100%, rgba(99,102,241,0.3), transparent 55%)',
+              'radial-gradient(circle at 15% 15%, rgba(0,224,219,0.32), transparent 55%), radial-gradient(circle at 85% 75%, rgba(0,224,219,0.16), transparent 55%)',
           }}
         />
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-0 opacity-[0.08]"
+          className="pointer-events-none absolute inset-0 opacity-[0.14]"
           style={{
             backgroundImage:
-              'linear-gradient(rgba(255,255,255,0.6) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.6) 1px, transparent 1px)',
+              'linear-gradient(rgba(0,224,219,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(0,224,219,0.5) 1px, transparent 1px)',
             backgroundSize: '40px 40px',
           }}
         />
 
-        <div className="relative z-10 mb-12 max-w-lg">
+        <div
+          className="relative z-10 mb-12 max-w-lg animate-cinematic-reveal"
+          style={{ animationDelay: '100ms' }}
+        >
           <h2 className="text-2xl font-semibold leading-tight text-white lg:text-3xl">
-            Você não precisa entender de marketing pra saber se ele está
-            funcionando.
+            Seu anúncio não para de gastar só porque você parou de olhar.
           </h2>
           <p className="mt-4 text-base leading-relaxed text-white/65">
-            O Vigia traduz seu anúncio em uma resposta simples: o dinheiro que
-            você investiu está voltando? Se não, a gente te avisa antes que
-            vire prejuízo.
+            O Vigia continua de olho — 24 horas por dia, sem precisar abrir
+            relatório nenhum. Se algo sair do esperado, a gente avisa antes
+            que vire prejuízo.
           </p>
         </div>
 
         {/* Vitrine traduzida — número técnico explicado em linguagem humana */}
-        <div className="relative z-10 w-full max-w-lg rounded-2xl border border-white/10 bg-white/[0.04] p-7 shadow-2xl shadow-black/40 backdrop-blur-sm">
+        <div
+          className="relative z-10 w-full max-w-lg animate-cinematic-reveal rounded-2xl border border-white/10 bg-white/[0.04] p-7 shadow-2xl shadow-black/40 backdrop-blur-sm"
+          style={{ animationDelay: '220ms' }}
+        >
           <div className="flex flex-col gap-5">
             <div>
               <p className="text-sm text-white/60">Cada cliente novo custou</p>
@@ -76,7 +73,7 @@ export function LoginPage() {
               <p className="text-sm text-white/60">Pra cada R$ 1 investido, voltaram</p>
               <p className="mt-1 text-3xl font-semibold text-white">
                 R$ 3,20
-                <span className="ml-2 inline-flex items-center gap-1 rounded-full bg-emerald-400/15 px-2.5 py-1 text-sm font-medium text-emerald-300 align-middle">
+                <span className="ml-2 inline-flex items-center gap-1 rounded-full bg-status-bom/15 px-2.5 py-1 text-sm font-medium text-status-bom-texto align-middle">
                   <TrendingUp className="size-3.5" />
                   bom sinal
                 </span>
@@ -92,50 +89,100 @@ export function LoginPage() {
           </div>
         </div>
 
-        <div className="relative z-10 mt-10 flex items-center gap-2 text-sm text-white/40">
-          <Zap className="size-4 text-emerald-400" />
+        <div
+          className="relative z-10 mt-10 flex animate-cinematic-reveal items-center gap-2 text-sm text-white/40"
+          style={{ animationDelay: '340ms' }}
+        >
+          <Zap className="size-4 text-marca" />
           Sem termos técnicos. Sem precisar virar especialista.
         </div>
       </div>
 
       {/* Coluna do formulário */}
       <div className="flex items-center justify-center border-t border-border px-6 py-12 lg:border-l lg:border-t-0">
-        <div className="w-full max-w-md">
+        <div
+          className="w-full max-w-md animate-cinematic-reveal"
+          style={{ animationDelay: '160ms' }}
+        >
+          <div className="mb-10 flex items-center gap-2">
+            <VigiaLogo className="size-8 text-marca" />
+            <span className="text-base font-semibold tracking-wide text-foreground">
+              VIGIA
+            </span>
+          </div>
+
           <h1 className="text-2xl font-semibold leading-tight text-foreground">
             Bem-vindo de volta
           </h1>
-          <p className="mt-3 text-sm text-text-terciario">
+          <div className="mt-3 h-0.5 w-10 rounded-full bg-marca" />
+          <p className="mt-4 text-sm text-text-terciario">
             Entre para continuar acompanhando seus anúncios.
           </p>
 
           <form onSubmit={handleSubmit} className="mt-10 flex flex-col gap-5">
             <div className="flex flex-col gap-2">
-              <Label htmlFor="email">E-mail</Label>
-              <Input
-                id="email"
-                type="email"
-                autoComplete="email"
-                autoFocus
-                placeholder="voce@empresa.com"
-                value={email}
-                onChange={(event) => setEmail(event.target.value)}
-                required
-                className="h-12 text-base"
-              />
+              <Label
+                htmlFor="email"
+                className="text-xs font-semibold uppercase tracking-wide text-marca"
+              >
+                E-mail
+              </Label>
+              <div className="relative">
+                <Mail className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-text-quaternario" />
+                <Input
+                  id="email"
+                  type="email"
+                  autoComplete="email"
+                  autoFocus
+                  placeholder="voce@empresa.com"
+                  value={email}
+                  onChange={(event) => setEmail(event.target.value)}
+                  required
+                  className="h-12 pl-10 text-base"
+                />
+              </div>
             </div>
 
             <div className="flex flex-col gap-2">
-              <Label htmlFor="senha">Senha</Label>
-              <Input
-                id="senha"
-                type="password"
-                autoComplete="current-password"
-                placeholder="••••••••"
-                value={senha}
-                onChange={(event) => setSenha(event.target.value)}
-                required
-                className="h-12 text-base"
-              />
+              <div className="flex items-center justify-between">
+                <Label
+                  htmlFor="senha"
+                  className="text-xs font-semibold uppercase tracking-wide text-marca"
+                >
+                  Senha
+                </Label>
+                <button
+                  type="button"
+                  className="cursor-pointer text-xs font-medium text-text-terciario transition-colors hover:text-marca"
+                >
+                  Esqueceu?
+                </button>
+              </div>
+              <div className="relative">
+                <Lock className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-text-quaternario" />
+                <Input
+                  id="senha"
+                  type={mostrarSenha ? 'text' : 'password'}
+                  autoComplete="current-password"
+                  placeholder="••••••••"
+                  value={senha}
+                  onChange={(event) => setSenha(event.target.value)}
+                  required
+                  className="h-12 px-10 text-base"
+                />
+                <button
+                  type="button"
+                  onClick={() => setMostrarSenha((atual) => !atual)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-text-quaternario transition-colors hover:text-text-terciario"
+                  aria-label={mostrarSenha ? 'Ocultar senha' : 'Mostrar senha'}
+                >
+                  {mostrarSenha ? (
+                    <EyeOff className="size-4" />
+                  ) : (
+                    <Eye className="size-4" />
+                  )}
+                </button>
+              </div>
             </div>
 
             {login.isError && (
@@ -149,14 +196,59 @@ export function LoginPage() {
             <button
               type="submit"
               disabled={login.isPending}
-              className="mt-2 h-12 rounded-lg bg-gradient-to-r from-emerald-400 to-cyan-500 text-base font-semibold text-black shadow-lg shadow-emerald-500/20 transition-all hover:shadow-emerald-500/30 hover:brightness-110 disabled:opacity-50"
+              className="mt-2 h-12 cursor-pointer rounded-lg text-base font-semibold text-white transition-all active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
+              style={{
+                background: login.isPending
+                  ? 'rgba(0,224,219,0.3)'
+                  : 'linear-gradient(135deg, #00e0db 0%, #00b8b3 100%)',
+                boxShadow: login.isPending
+                  ? 'none'
+                  : '0 0 28px rgba(0,224,219,0.25)',
+              }}
             >
-              {login.isPending ? 'Entrando...' : 'Entrar no painel'}
+              {login.isPending ? (
+                <span className="flex items-center justify-center gap-2">
+                  <svg
+                    className="size-3.5 animate-spin"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                  >
+                    <circle
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                      opacity="0.25"
+                    />
+                    <path
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                      opacity="0.75"
+                    />
+                  </svg>
+                  Entrando...
+                </span>
+              ) : (
+                'Entrar no painel'
+              )}
             </button>
           </form>
 
-          <p className="mt-10 text-center text-xs text-text-quaternario">
-            Acesso restrito a contas autorizadas pela sua organização.
+          <div className="mt-8 flex items-center gap-3">
+            <div className="h-px flex-1 bg-white/10" />
+            <span className="text-xs uppercase tracking-wide text-text-quaternario">ou</span>
+            <div className="h-px flex-1 bg-white/10" />
+          </div>
+
+          <p className="mt-6 text-center text-sm text-text-terciario">
+            Não tem conta?{' '}
+            <button
+              type="button"
+              className="cursor-pointer font-medium text-marca transition-all hover:text-marca-hover active:scale-[0.98]"
+            >
+              Criar conta grátis
+            </button>
           </p>
         </div>
       </div>

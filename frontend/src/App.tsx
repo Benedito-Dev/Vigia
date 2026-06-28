@@ -1,6 +1,8 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { LoginPage } from '@/pages/login/login-page'
 import { DashboardPage } from '@/pages/dashboard/dashboard-page'
+import { AprovacoesPage } from '@/pages/aprovacoes/aprovacoes-page'
+import { ConfiguracoesPage } from '@/pages/configuracoes/configuracoes-page'
 import { RotaPrivada } from '@/app/rota-privada'
 
 function App() {
@@ -13,6 +15,22 @@ function App() {
           element={
             <RotaPrivada>
               <DashboardPage />
+            </RotaPrivada>
+          }
+        />
+        <Route
+          path="/aprovacoes"
+          element={
+            <RotaPrivada>
+              <AprovacoesPage />
+            </RotaPrivada>
+          }
+        />
+        <Route
+          path="/configuracoes"
+          element={
+            <RotaPrivada>
+              <ConfiguracoesPage />
             </RotaPrivada>
           }
         />
