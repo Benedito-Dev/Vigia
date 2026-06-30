@@ -1,9 +1,12 @@
-import { FolderKanban } from 'lucide-react'
+import { FolderKanban, Users } from 'lucide-react'
 import { NavLink } from 'react-router-dom'
 import { VigiaLogo } from '@/components/shared/vigia-logo'
 import { cn } from '@/lib/utils'
 
-const itensNavegacao = [{ to: '/projetos', label: 'Projetos', icone: FolderKanban }]
+const itensNavegacao = [
+  { to: '/projetos', label: 'Projetos', icone: FolderKanban },
+  { to: '/equipe', label: 'Equipe', icone: Users },
+]
 
 export function GlobalSidebar() {
   return (

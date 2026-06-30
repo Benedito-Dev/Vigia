@@ -10,14 +10,30 @@ import type { EstadoStatus } from '@/components/shared/linha-status'
 
 export type Periodo = 'hoje' | '7d' | 'mes'
 
+export interface ConexaoMeta {
+  status: 'conectado' | 'expirado'
+  externalId: string
+  conectadoEm: string
+}
+
+export interface LimiteSeguranca {
+  tetoVerbaDiaria: number
+  cplMaximo: number
+  escalaMaxPctDia: number
+  atualizadoEm: string
+}
+
 export interface ProjetoResumo {
   id: string
   clienteNome: string
   nicho: string
+  ticketMedio: number
   investidoMes: number
   roasMedio: number
   campanhasAtivas: number
   campanhasEmDesvio: number
+  conexaoMeta: ConexaoMeta
+  limiteSeguranca: LimiteSeguranca
 }
 
 export interface CampanhaResumo {
@@ -71,19 +87,43 @@ export const projetosMock: ProjetoResumo[] = [
     id: 'proj-1',
     clienteNome: 'Loja Aurora',
     nicho: 'E-commerce · Moda',
+    ticketMedio: 180,
     investidoMes: 13500,
     roasMedio: 3.1,
     campanhasAtivas: 4,
     campanhasEmDesvio: 0,
+    conexaoMeta: {
+      status: 'conectado',
+      externalId: 'act_8847261039',
+      conectadoEm: '2026-04-12',
+    },
+    limiteSeguranca: {
+      tetoVerbaDiaria: 800,
+      cplMaximo: 20,
+      escalaMaxPctDia: 20,
+      atualizadoEm: '2026-04-12',
+    },
   },
   {
     id: 'proj-2',
     clienteNome: 'Studio Bella',
     nicho: 'Serviços · Beleza',
+    ticketMedio: 220,
     investidoMes: 6200,
     roasMedio: 1.8,
     campanhasAtivas: 3,
     campanhasEmDesvio: 2,
+    conexaoMeta: {
+      status: 'expirado',
+      externalId: 'act_5512098374',
+      conectadoEm: '2026-02-03',
+    },
+    limiteSeguranca: {
+      tetoVerbaDiaria: 350,
+      cplMaximo: 35,
+      escalaMaxPctDia: 20,
+      atualizadoEm: '2026-02-03',
+    },
   },
 ]
 

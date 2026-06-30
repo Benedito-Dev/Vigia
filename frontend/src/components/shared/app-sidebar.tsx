@@ -1,15 +1,28 @@
-import { Inbox, LayoutGrid, Settings } from 'lucide-react'
-import { NavLink } from 'react-router-dom'
+import { Check, ChevronDown, Folder, Inbox, LayoutGrid, Megaphone, Settings } from 'lucide-react'
+import { NavLink, useNavigate } from 'react-router-dom'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import { VigiaLogo } from '@/components/shared/vigia-logo'
+import { projetosMock } from '@/features/dashboard/dados-mock'
+import { useProjetoAtual } from '@/app/use-projeto-atual'
 import { cn } from '@/lib/utils'
 
 const itensNavegacao = [
   { to: '/', label: 'Painel', icone: LayoutGrid },
+  { to: '/campanhas', label: 'Campanhas', icone: Megaphone },
   { to: '/aprovacoes', label: 'Aprovações', icone: Inbox },
   { to: '/configuracoes', label: 'Configurações', icone: Settings },
 ]
 
 export function AppSidebar() {
+  const navigate = useNavigate()
+  const { projetoAtual, selecionarProjeto } = useProjetoAtual()
+
   return (
     <aside className="relative flex h-svh w-64 shrink-0 flex-col overflow-hidden border-r border-border px-4 py-6">
       <div className="relative flex items-center gap-3 px-2">
@@ -20,7 +33,40 @@ export function AppSidebar() {
         <span className="text-lg font-semibold tracking-wide text-marca-texto">VIGIA</span>
       </div>
 
-      <div className="relative mt-6 h-px bg-border" />
+      <div className="relative mt-5 px-2">
+        <DropdownMenu>
+          <DropdownMenuTrigger className="flex w-full cursor-pointer items-center gap-2 rounded-lg border border-border bg-secondary px-2.5 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted">
+            <Folder className="size-[17px] shrink-0 text-marca-texto" />
+            <span className="truncate">{projetoAtual.clienteNome}</span>
+            <ChevronDown className="ml-auto size-3.5 shrink-0 text-text-terciario" />
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="w-56 p-1.5">
+            {projetosMock.map((projeto) => {
+              const ativo = projeto.id === projetoAtual.id
+              return (
+                <DropdownMenuItem
+                  key={projeto.id}
+                  onClick={() => selecionarProjeto(projeto)}
+                  className="cursor-pointer justify-between rounded-md px-2.5 py-2 text-sm"
+                >
+                  {projeto.clienteNome}
+                  {ativo && <Check className="size-3.5 text-marca-texto" />}
+                </DropdownMenuItem>
+              )
+            })}
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              onClick={() => navigate('/projetos')}
+              className="cursor-pointer gap-2 rounded-md px-2.5 py-2 text-sm text-text-terciario"
+            >
+              <Folder className="size-3.5" />
+              Ver todos os projetos
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+
+      <div className="relative mt-5 h-px bg-border" />
 
       <nav className="relative mt-6 flex flex-col gap-1">
         {itensNavegacao.map(({ to, label, icone: Icone }) => (

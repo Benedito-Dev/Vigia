@@ -7,7 +7,6 @@ import { projetosMock as projetosMockIniciais, type ProjetoResumo } from '@/feat
 import { useProjetoAtual } from '@/app/use-projeto-atual'
 import { useTheme } from '@/app/use-theme'
 import { VigiaLogo } from '@/components/shared/vigia-logo'
-import { GlobalSidebar } from '@/components/shared/global-sidebar'
 
 export function ProjetosPage() {
   const navigate = useNavigate()
@@ -20,26 +19,35 @@ export function ProjetosPage() {
     navigate('/')
   }
 
-  function criarProjeto(dados: { clienteNome: string; nicho: string }) {
+  function criarProjeto(dados: { clienteNome: string; nicho: string; externalId: string }) {
     const novoProjeto: ProjetoResumo = {
       id: `proj-${Date.now()}`,
       clienteNome: dados.clienteNome,
       nicho: dados.nicho,
+      ticketMedio: 0,
       investidoMes: 0,
       roasMedio: 0,
       campanhasAtivas: 0,
       campanhasEmDesvio: 0,
+      conexaoMeta: {
+        status: 'conectado',
+        externalId: dados.externalId,
+        conectadoEm: new Date().toISOString().slice(0, 10),
+      },
+      limiteSeguranca: {
+        tetoVerbaDiaria: 0,
+        cplMaximo: 0,
+        escalaMaxPctDia: 20,
+        atualizadoEm: new Date().toISOString().slice(0, 10),
+      },
     }
     setProjetos((atuais) => [...atuais, novoProjeto])
     abrirProjeto(novoProjeto)
   }
 
   return (
-    <div className="flex min-h-svh">
-      <GlobalSidebar />
-
-      <div className="flex-1">
-        <header className="flex items-center justify-end gap-1 border-b border-border px-6 py-4">
+    <div className="flex-1">
+      <header className="flex items-center justify-end gap-1 border-b border-border px-6 py-4">
           <button
             type="button"
             onClick={alternarTema}
@@ -131,7 +139,6 @@ export function ProjetosPage() {
             </div>
           )}
         </main>
-      </div>
     </div>
   )
 }

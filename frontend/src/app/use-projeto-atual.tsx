@@ -4,6 +4,7 @@ import { projetosMock, type ProjetoResumo } from '@/features/dashboard/dados-moc
 interface ProjetoAtualContextValue {
   projetoAtual: ProjetoResumo
   selecionarProjeto: (projeto: ProjetoResumo) => void
+  atualizarProjeto: (projeto: ProjetoResumo) => void
 }
 
 const ProjetoAtualContext = createContext<ProjetoAtualContextValue | null>(null)
@@ -12,7 +13,9 @@ export function ProjetoAtualProvider({ children }: { children: ReactNode }) {
   const [projetoAtual, setProjetoAtual] = useState<ProjetoResumo>(projetosMock[0])
 
   return (
-    <ProjetoAtualContext.Provider value={{ projetoAtual, selecionarProjeto: setProjetoAtual }}>
+    <ProjetoAtualContext.Provider
+      value={{ projetoAtual, selecionarProjeto: setProjetoAtual, atualizarProjeto: setProjetoAtual }}
+    >
       {children}
     </ProjetoAtualContext.Provider>
   )
