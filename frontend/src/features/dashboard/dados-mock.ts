@@ -13,6 +13,11 @@ export type Periodo = 'hoje' | '7d' | 'mes'
 export interface ProjetoResumo {
   id: string
   clienteNome: string
+  nicho: string
+  investidoMes: number
+  roasMedio: number
+  campanhasAtivas: number
+  campanhasEmDesvio: number
 }
 
 export interface CampanhaResumo {
@@ -42,11 +47,44 @@ export interface ResumoPeriodo {
   roasMedio: number
   roasMedioMeta: number
   campanhas: CampanhaResumo[]
+  tendencia: {
+    investimento: number[]
+    faturamento: number[]
+    lucroLiquido: number[]
+    cplMedio: number[]
+    roasMedio: number[]
+  }
+}
+
+/**
+ * Gera uma serie de 7 pontos terminando em `valorFinal`, com variacao
+ * proporcional deterministica (sem random) — so para alimentar o sparkline
+ * visual ate o endpoint real de serie temporal (GET /metrics/trend) existir.
+ */
+function gerarTendencia(valorFinal: number, amplitudePct: number): number[] {
+  const oscilacao = [0.62, 0.74, 0.68, 0.84, 0.79, 0.93, 1]
+  return oscilacao.map((fator) => Math.max(0, valorFinal * (1 - amplitudePct + amplitudePct * fator)))
 }
 
 export const projetosMock: ProjetoResumo[] = [
-  { id: 'proj-1', clienteNome: 'Loja Aurora' },
-  { id: 'proj-2', clienteNome: 'Studio Bella' },
+  {
+    id: 'proj-1',
+    clienteNome: 'Loja Aurora',
+    nicho: 'E-commerce · Moda',
+    investidoMes: 13500,
+    roasMedio: 3.1,
+    campanhasAtivas: 4,
+    campanhasEmDesvio: 0,
+  },
+  {
+    id: 'proj-2',
+    clienteNome: 'Studio Bella',
+    nicho: 'Serviços · Beleza',
+    investidoMes: 6200,
+    roasMedio: 1.8,
+    campanhasAtivas: 3,
+    campanhasEmDesvio: 2,
+  },
 ]
 
 export const aprovacoesPendentesMock = 2
@@ -100,9 +138,9 @@ const baseCampanhas: CampanhaResumo[] = [
 
 export const resumoPorPeriodoMock: Record<Periodo, ResumoPeriodo> = {
   hoje: {
-    campanhasEmDesvio: 2,
+    campanhasEmDesvio: 0,
     totalCampanhas: 4,
-    campanhasPausadasIa: 1,
+    campanhasPausadasIa: 0,
     orcamento: 800,
     investimento: 450,
     faturamento: 1820,
@@ -113,7 +151,18 @@ export const resumoPorPeriodoMock: Record<Periodo, ResumoPeriodo> = {
     cplMedioMeta: 16.0,
     roasMedio: 2.9,
     roasMedioMeta: 2.8,
-    campanhas: baseCampanhas,
+    campanhas: baseCampanhas.map((c) => ({
+      ...c,
+      estado: c.status === 'aprendendo' ? 'neutro' : 'bom',
+      desvioPct: Math.abs(c.desvioPct),
+    })),
+    tendencia: {
+      investimento: gerarTendencia(450, 0.4),
+      faturamento: gerarTendencia(1820, 0.5),
+      lucroLiquido: gerarTendencia(1370, 0.5),
+      cplMedio: gerarTendencia(18.7, 0.25),
+      roasMedio: gerarTendencia(2.9, 0.3),
+    },
   },
   '7d': {
     campanhasEmDesvio: 1,
@@ -130,6 +179,13 @@ export const resumoPorPeriodoMock: Record<Periodo, ResumoPeriodo> = {
     roasMedio: 3.0,
     roasMedioMeta: 2.8,
     campanhas: baseCampanhas.map((c) => ({ ...c, estado: c.id === 'camp-2' ? 'bom' : c.estado })),
+    tendencia: {
+      investimento: gerarTendencia(3150, 0.45),
+      faturamento: gerarTendencia(12740, 0.55),
+      lucroLiquido: gerarTendencia(9590, 0.55),
+      cplMedio: gerarTendencia(17.9, 0.2),
+      roasMedio: gerarTendencia(3.0, 0.25),
+    },
   },
   mes: {
     campanhasEmDesvio: 1,
@@ -146,6 +202,13 @@ export const resumoPorPeriodoMock: Record<Periodo, ResumoPeriodo> = {
     roasMedio: 3.1,
     roasMedioMeta: 2.8,
     campanhas: baseCampanhas.map((c) => ({ ...c, estado: c.id === 'camp-2' ? 'bom' : c.estado })),
+    tendencia: {
+      investimento: gerarTendencia(13500, 0.5),
+      faturamento: gerarTendencia(54600, 0.6),
+      lucroLiquido: gerarTendencia(41100, 0.6),
+      cplMedio: gerarTendencia(17.2, 0.18),
+      roasMedio: gerarTendencia(3.1, 0.2),
+    },
   },
 }
 

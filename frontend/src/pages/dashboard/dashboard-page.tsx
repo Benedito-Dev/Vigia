@@ -1,15 +1,12 @@
 import { useState } from 'react'
-import { ArrowDown, ArrowUp, Pause } from 'lucide-react'
+import { ArrowDown, ArrowUp, CheckCircle2, Pause } from 'lucide-react'
 import { AppLayout } from '@/components/shared/app-layout'
 import { PainelCard } from '@/components/shared/painel-card'
+import { KpiCard } from '@/components/shared/kpi-card'
 import type { EstadoStatus } from '@/components/shared/linha-status'
-import {
-  projetosMock,
-  resumoPorPeriodoMock,
-  rotuloPeriodo,
-  type Periodo,
-} from '@/features/dashboard/dados-mock'
+import { resumoPorPeriodoMock, rotuloPeriodo, type Periodo } from '@/features/dashboard/dados-mock'
 import { cn } from '@/lib/utils'
+import { useProjetoAtual } from '@/app/use-projeto-atual'
 
 const periodos: Periodo[] = ['hoje', '7d', 'mes']
 
@@ -28,8 +25,9 @@ const corTextoPorEstado: Record<EstadoStatus, string> = {
 }
 
 export function DashboardPage() {
-  const [projetoAtual, setProjetoAtual] = useState(projetosMock[0])
+  const { projetoAtual } = useProjetoAtual()
   const [periodo, setPeriodo] = useState<Periodo>('hoje')
+  const [carregando, setCarregando] = useState(false)
 
   const resumo = resumoPorPeriodoMock[periodo]
   const totalSaudavel = resumo.campanhas.filter((c) => c.estado === 'bom').length
@@ -37,8 +35,15 @@ export function DashboardPage() {
   const totalCritico = resumo.campanhas.filter((c) => c.estado === 'critico').length
   const totalAprendendo = resumo.campanhas.filter((c) => c.status === 'aprendendo').length
 
+  function trocarPeriodo(opcao: Periodo) {
+    if (opcao === periodo) return
+    setCarregando(true)
+    setPeriodo(opcao)
+    setTimeout(() => setCarregando(false), 220)
+  }
+
   return (
-    <AppLayout projetoAtual={projetoAtual} onProjetoChange={setProjetoAtual}>
+    <AppLayout>
       <div className="flex flex-col gap-4">
         <div>
           <h1 className="text-xl font-semibold text-foreground">{projetoAtual.clienteNome}</h1>
@@ -51,7 +56,7 @@ export function DashboardPage() {
                 <button
                   key={opcao}
                   type="button"
-                  onClick={() => setPeriodo(opcao)}
+                  onClick={() => trocarPeriodo(opcao)}
                   className={cn(
                     'cursor-pointer rounded-md px-3 py-1 text-xs font-medium transition-colors',
                     periodo === opcao
@@ -66,20 +71,26 @@ export function DashboardPage() {
           </div>
         </div>
 
-        <div className="grid grid-cols-[1fr_320px] gap-4">
+        <div
+          className={cn(
+            'flex flex-col gap-4 transition-opacity duration-200',
+            carregando ? 'opacity-40' : 'opacity-100',
+          )}
+        >
+        <div className="grid grid-cols-[1fr_300px] gap-4">
           {resumo.campanhasEmDesvio > 0 ? (
-            <div className="rounded-xl border border-status-critico/25 bg-status-critico/[0.05] px-7 py-6">
-              <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-status-critico-texto">
-                <span className="size-1.5 rounded-full bg-status-critico" />
+            <div className="relative overflow-hidden rounded-xl border border-status-critico/40 bg-card px-8 py-7 shadow-[var(--shadow-card-lg)]">
+              <span className="absolute inset-y-0 left-0 w-1 bg-status-critico" />
+              <p className="text-xs font-semibold uppercase tracking-wide text-status-critico-texto">
                 Precisa da sua atenção
               </p>
-              <p className="mt-3 text-5xl font-semibold leading-none tracking-tight text-foreground">
+              <p className="mt-4 text-7xl font-bold leading-none tracking-tight text-status-critico">
                 {resumo.campanhasEmDesvio}
-                <span className="ml-3 text-lg font-medium text-text-terciario">
+                <span className="ml-4 text-lg font-medium text-foreground">
                   de {resumo.totalCampanhas} campanhas ativas estão fora da meta
                 </span>
               </p>
-              <p className="mt-4 max-w-md text-sm text-text-terciario">
+              <p className="mt-5 max-w-md text-sm text-foreground">
                 {resumo.campanhasPausadasIa > 0 && (
                   <>O Vigia pausou {resumo.campanhasPausadasIa} campanha automaticamente por desvio crítico. </>
                 )}
@@ -87,28 +98,33 @@ export function DashboardPage() {
               </p>
               <button
                 type="button"
-                className="mt-5 cursor-pointer rounded-lg bg-marca px-4 py-2 text-sm font-semibold text-[#031716] transition-colors hover:bg-marca-hover"
+                className="mt-6 cursor-pointer rounded-lg bg-status-critico px-5 py-2.5 text-sm font-semibold text-white shadow-[var(--shadow-button)] transition-colors hover:opacity-90"
               >
                 Revisar {resumo.campanhasEmDesvio} campanhas →
               </button>
             </div>
           ) : (
-            <div className="rounded-xl border border-status-bom/25 bg-status-bom/[0.05] px-7 py-6">
-              <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-status-bom-texto">
-                <span className="size-1.5 rounded-full bg-status-bom" />
+            <div className="relative overflow-hidden rounded-xl border border-status-bom/40 bg-card px-8 py-7 shadow-[var(--shadow-card-lg)]">
+              <span className="absolute inset-y-0 left-0 w-1 bg-status-bom" />
+              <p className="text-xs font-semibold uppercase tracking-wide text-status-bom-texto">
                 Tudo sob controle
               </p>
-              <p className="mt-3 text-5xl font-semibold leading-none tracking-tight text-foreground">
-                R$ {resumo.lucroLiquido.toLocaleString('pt-BR')}
-                <span className="ml-3 text-lg font-medium text-text-terciario">de lucro líquido</span>
-              </p>
-              <p className="mt-4 max-w-md text-sm text-text-terciario">
-                Nenhuma campanha está fora da meta neste período.
+              <div className="mt-4 flex items-center gap-4">
+                <CheckCircle2 className="size-12 shrink-0 text-status-bom" strokeWidth={1.75} />
+                <p className="text-2xl font-bold leading-tight tracking-tight text-foreground">
+                  Todas as suas campanhas estão OK
+                  <span className="mt-1 block text-sm font-medium text-foreground">
+                    Nenhuma campanha está fora da meta neste período.
+                  </span>
+                </p>
+              </div>
+              <p className="mt-5 text-sm text-text-terciario">
+                R$ {resumo.lucroLiquido.toLocaleString('pt-BR')} de lucro líquido
               </p>
             </div>
           )}
 
-          <div className="rounded-xl border border-border bg-card px-5 py-5">
+          <div className="rounded-xl border border-border bg-card px-5 py-5 shadow-[var(--shadow-card)]">
             <p className="text-xs font-semibold uppercase tracking-wide text-text-quaternario">
               Saúde das campanhas
             </p>
@@ -121,47 +137,73 @@ export function DashboardPage() {
               <span className="text-status-critico-texto">{totalCritico} críticas</span>
               <span className="text-status-atencao">{totalAtencao} em atenção</span>
               <span className="text-status-bom-texto">{totalSaudavel} saudáveis</span>
-              <span className="text-marca">{totalAprendendo} aprendendo</span>
+              <span className="text-marca-texto">{totalAprendendo} aprendendo</span>
             </div>
           </div>
         </div>
 
         <div className="grid grid-cols-5 gap-3">
-          <div className="rounded-lg border border-border-subtle bg-card px-4 py-3.5">
-            <p className="text-xs text-text-terciario">Investido</p>
-            <p className="mt-1.5 text-xl font-semibold text-foreground">
-              R$ {resumo.investimento.toLocaleString('pt-BR')}
-            </p>
-            <p className="mt-1 text-xs text-text-quaternario">de R$ {resumo.orcamento.toLocaleString('pt-BR')} orçados</p>
-          </div>
-          <div className="rounded-lg border border-border-subtle bg-card px-4 py-3.5">
-            <p className="text-xs text-text-terciario">Faturamento</p>
-            <p className="mt-1.5 text-xl font-semibold text-marca">
-              R$ {resumo.faturamento.toLocaleString('pt-BR')}
-            </p>
-            <p className="mt-1 flex items-center gap-1 text-xs text-status-bom-texto">
-              <ArrowUp className="size-3" /> {resumo.faturamentoVarPct}% vs. período anterior
-            </p>
-          </div>
-          <div className="rounded-lg border border-border-subtle bg-card px-4 py-3.5">
-            <p className="text-xs text-text-terciario">Lucro líquido</p>
-            <p className="mt-1.5 text-xl font-semibold text-foreground">
-              R$ {resumo.lucroLiquido.toLocaleString('pt-BR')}
-            </p>
-            <p className="mt-1 flex items-center gap-1 text-xs text-status-bom-texto">
-              <ArrowUp className="size-3" /> {resumo.lucroLiquidoVarPct}% vs. período anterior
-            </p>
-          </div>
-          <div className="rounded-lg border border-border-subtle bg-card px-4 py-3.5">
-            <p className="text-xs text-text-terciario">CPL médio</p>
-            <p className="mt-1.5 text-xl font-semibold text-status-atencao">R$ {resumo.cplMedio.toFixed(2)}</p>
-            <p className="mt-1 text-xs text-text-quaternario">meta R$ {resumo.cplMedioMeta.toFixed(2)}</p>
-          </div>
-          <div className="rounded-lg border border-border-subtle bg-card px-4 py-3.5">
-            <p className="text-xs text-text-terciario">ROAS médio</p>
-            <p className="mt-1.5 text-xl font-semibold text-status-bom-texto">{resumo.roasMedio.toFixed(1)}x</p>
-            <p className="mt-1 text-xs text-text-quaternario">meta {resumo.roasMedioMeta.toFixed(1)}x</p>
-          </div>
+          <KpiCard
+            label="Investido"
+            valor={resumo.investimento}
+            tendencia={resumo.tendencia.investimento}
+            corValor="text-grafico-azul"
+            corSparkline="var(--color-grafico-azul)"
+            formatar={(v) => `R$ ${v.toLocaleString('pt-BR', { maximumFractionDigits: 0 })}`}
+            rodape={<>de R$ {resumo.orcamento.toLocaleString('pt-BR')} orçados</>}
+          />
+          <KpiCard
+            label="Faturamento"
+            valor={resumo.faturamento}
+            tendencia={resumo.tendencia.faturamento}
+            corValor="text-grafico-positivo"
+            corSparkline="var(--color-grafico-positivo)"
+            direcaoBoa="subir"
+            formatar={(v) => `R$ ${v.toLocaleString('pt-BR', { maximumFractionDigits: 0 })}`}
+            rodape={
+              <span className="flex items-center gap-1 text-status-bom-texto">
+                <ArrowUp className="size-3" /> {resumo.faturamentoVarPct}% vs. período anterior
+              </span>
+            }
+          />
+          <KpiCard
+            label="Lucro líquido"
+            valor={resumo.lucroLiquido}
+            tendencia={resumo.tendencia.lucroLiquido}
+            corValor="text-grafico-positivo"
+            corSparkline="var(--color-grafico-positivo)"
+            direcaoBoa="subir"
+            formatar={(v) => `R$ ${v.toLocaleString('pt-BR', { maximumFractionDigits: 0 })}`}
+            rodape={
+              <span className="flex items-center gap-1 text-status-bom-texto">
+                <ArrowUp className="size-3" /> {resumo.lucroLiquidoVarPct}% vs. período anterior
+              </span>
+            }
+          />
+          <KpiCard
+            label="CPL médio"
+            valor={resumo.cplMedio}
+            tendencia={resumo.tendencia.cplMedio}
+            corValor="text-grafico-atencao"
+            corSparkline="var(--color-grafico-atencao)"
+            direcaoBoa="descer"
+            meta={resumo.cplMedioMeta}
+            rotuloMeta={`meta R$ ${resumo.cplMedioMeta.toFixed(2)}`}
+            formatar={(v) => `R$ ${v.toFixed(2)}`}
+            rodape={<>meta R$ {resumo.cplMedioMeta.toFixed(2)}</>}
+          />
+          <KpiCard
+            label="ROAS médio"
+            valor={resumo.roasMedio}
+            tendencia={resumo.tendencia.roasMedio}
+            corValor="text-grafico-positivo"
+            corSparkline="var(--color-grafico-positivo)"
+            direcaoBoa="subir"
+            meta={resumo.roasMedioMeta}
+            rotuloMeta={`meta ${resumo.roasMedioMeta.toFixed(1)}x`}
+            formatar={(v) => `${v.toFixed(1)}x`}
+            rodape={<>meta {resumo.roasMedioMeta.toFixed(1)}x</>}
+          />
         </div>
 
         <PainelCard eyebrow={`Campanhas · ${resumo.totalCampanhas} ativas`}>
@@ -188,7 +230,7 @@ export function DashboardPage() {
                       <div>
                         <p className="text-[15px] font-medium text-foreground">{campanha.nome}</p>
                         {campanha.status === 'aprendendo' && (
-                          <span className="text-xs text-marca">calibrando</span>
+                          <span className="text-xs text-marca-texto">calibrando</span>
                         )}
                         {campanha.status === 'pausada_ia' && (
                           <span className="flex items-center gap-1 text-xs text-status-critico-texto">
@@ -229,6 +271,7 @@ export function DashboardPage() {
             )}
           </div>
         </PainelCard>
+        </div>
       </div>
     </AppLayout>
   )

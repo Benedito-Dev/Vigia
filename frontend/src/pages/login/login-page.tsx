@@ -25,21 +25,13 @@ export function LoginPage() {
   return (
     <div className="relative grid min-h-svh lg:grid-cols-2">
       {/* Coluna de vitrine — mockup vivo do produto */}
-      <div className="relative hidden overflow-hidden bg-[#0a0a0b] lg:flex lg:flex-col lg:justify-center lg:px-20">
+      <div className="relative hidden overflow-hidden bg-[#0e1116] lg:flex lg:flex-col lg:justify-center lg:px-20">
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-0"
+          className="pointer-events-none absolute inset-0 opacity-[0.06]"
           style={{
             backgroundImage:
-              'radial-gradient(circle at 15% 15%, rgba(0,224,219,0.32), transparent 55%), radial-gradient(circle at 85% 75%, rgba(0,224,219,0.16), transparent 55%)',
-          }}
-        />
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0 opacity-[0.14]"
-          style={{
-            backgroundImage:
-              'linear-gradient(rgba(0,224,219,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(0,224,219,0.5) 1px, transparent 1px)',
+              'linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px)',
             backgroundSize: '40px 40px',
           }}
         />
@@ -93,7 +85,7 @@ export function LoginPage() {
           className="relative z-10 mt-10 flex animate-cinematic-reveal items-center gap-2 text-sm text-white/40"
           style={{ animationDelay: '340ms' }}
         >
-          <Zap className="size-4 text-marca" />
+          <Zap className="size-4 text-text-terciario" />
           Sem termos técnicos. Sem precisar virar especialista.
         </div>
       </div>
@@ -105,7 +97,7 @@ export function LoginPage() {
           style={{ animationDelay: '160ms' }}
         >
           <div className="mb-10 flex items-center gap-2">
-            <VigiaLogo className="size-8 text-marca" />
+            <VigiaLogo className="size-8 text-foreground" />
             <span className="text-base font-semibold tracking-wide text-foreground">
               VIGIA
             </span>
@@ -123,7 +115,7 @@ export function LoginPage() {
             <div className="flex flex-col gap-2">
               <Label
                 htmlFor="email"
-                className="text-xs font-semibold uppercase tracking-wide text-marca"
+                className="text-xs font-semibold uppercase tracking-wide text-text-terciario"
               >
                 E-mail
               </Label>
@@ -147,13 +139,13 @@ export function LoginPage() {
               <div className="flex items-center justify-between">
                 <Label
                   htmlFor="senha"
-                  className="text-xs font-semibold uppercase tracking-wide text-marca"
+                  className="text-xs font-semibold uppercase tracking-wide text-text-terciario"
                 >
                   Senha
                 </Label>
                 <button
                   type="button"
-                  className="cursor-pointer text-xs font-medium text-text-terciario transition-colors hover:text-marca"
+                  className="cursor-pointer text-xs font-medium text-text-terciario transition-colors hover:text-marca-texto"
                 >
                   Esqueceu?
                 </button>
@@ -198,12 +190,7 @@ export function LoginPage() {
               disabled={login.isPending}
               className="mt-2 h-12 cursor-pointer rounded-lg text-base font-semibold text-white transition-all active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
               style={{
-                background: login.isPending
-                  ? 'rgba(0,224,219,0.3)'
-                  : 'linear-gradient(135deg, #00e0db 0%, #00b8b3 100%)',
-                boxShadow: login.isPending
-                  ? 'none'
-                  : '0 0 28px rgba(0,224,219,0.25)',
+                background: login.isPending ? 'rgba(58,82,184,0.35)' : '#3a52b8',
               }}
             >
               {login.isPending ? (
@@ -245,7 +232,7 @@ export function LoginPage() {
             Não tem conta?{' '}
             <button
               type="button"
-              className="cursor-pointer font-medium text-marca transition-all hover:text-marca-hover active:scale-[0.98]"
+              className="cursor-pointer font-medium text-marca-texto transition-all hover:text-marca-hover active:scale-[0.98]"
             >
               Criar conta grátis
             </button>

@@ -1,14 +1,10 @@
-import { useState } from 'react'
 import { Settings } from 'lucide-react'
 import { AppLayout } from '@/components/shared/app-layout'
 import { PainelCard } from '@/components/shared/painel-card'
-import { projetosMock } from '@/features/dashboard/dados-mock'
 
 export function ConfiguracoesPage() {
-  const [projetoAtual, setProjetoAtual] = useState(projetosMock[0])
-
   return (
-    <AppLayout projetoAtual={projetoAtual} onProjetoChange={setProjetoAtual}>
+    <AppLayout>
       <div className="mx-auto max-w-[1400px]">
         <PainelCard eyebrow="Configurações">
           <div className="flex flex-col items-center gap-3 py-16 text-center">

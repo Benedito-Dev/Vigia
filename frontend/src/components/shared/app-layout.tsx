@@ -1,24 +1,27 @@
 import type { ReactNode } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ChevronDown, LogOut } from 'lucide-react'
+import { ChevronDown, LogOut, Moon, Sun, LayoutList } from 'lucide-react'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { AppSidebar } from '@/components/shared/app-sidebar'
 import { logout } from '@/features/auth/use-auth'
-import { projetosMock, type ProjetoResumo } from '@/features/dashboard/dados-mock'
+import { projetosMock } from '@/features/dashboard/dados-mock'
+import { useTheme } from '@/app/use-theme'
+import { useProjetoAtual } from '@/app/use-projeto-atual'
 
 interface AppLayoutProps {
-  projetoAtual: ProjetoResumo
-  onProjetoChange: (projeto: ProjetoResumo) => void
   children: ReactNode
 }
 
-export function AppLayout({ projetoAtual, onProjetoChange, children }: AppLayoutProps) {
+export function AppLayout({ children }: AppLayoutProps) {
   const navigate = useNavigate()
+  const { tema, alternarTema } = useTheme()
+  const { projetoAtual, selecionarProjeto } = useProjetoAtual()
 
   return (
     <div className="flex min-h-svh">
@@ -35,26 +38,42 @@ export function AppLayout({ projetoAtual, onProjetoChange, children }: AppLayout
               {projetosMock.map((projeto) => (
                 <DropdownMenuItem
                   key={projeto.id}
-                  onClick={() => onProjetoChange(projeto)}
+                  onClick={() => selecionarProjeto(projeto)}
                   className="cursor-pointer"
                 >
                   {projeto.clienteNome}
                 </DropdownMenuItem>
               ))}
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => navigate('/projetos')} className="cursor-pointer">
+                <LayoutList className="size-3.5" />
+                Ver todos os projetos
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <button
-            type="button"
-            onClick={() => {
-              logout()
-              navigate('/login')
-            }}
-            className="cursor-pointer rounded-lg p-2 text-text-terciario transition-colors hover:bg-muted hover:text-foreground"
-            aria-label="Sair"
-          >
-            <LogOut className="size-4" />
-          </button>
+          <div className="flex items-center gap-1">
+            <button
+              type="button"
+              onClick={alternarTema}
+              className="cursor-pointer rounded-lg p-2 text-text-terciario transition-colors hover:bg-muted hover:text-foreground"
+              aria-label={tema === 'dark' ? 'Ativar modo claro' : 'Ativar modo escuro'}
+            >
+              {tema === 'dark' ? <Sun className="size-4" /> : <Moon className="size-4" />}
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                logout()
+                navigate('/login')
+              }}
+              className="cursor-pointer rounded-lg p-2 text-text-terciario transition-colors hover:bg-muted hover:text-foreground"
+              aria-label="Sair"
+            >
+              <LogOut className="size-4" />
+            </button>
+          </div>
         </header>
 
         <main className="px-6 py-6">{children}</main>

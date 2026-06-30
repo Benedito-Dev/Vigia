@@ -4,57 +4,127 @@
 @custom-variant dark (&:is(.dark *));
 
 /*
-  Vigia roda permanentemente em modo escuro (Design System V2, secao 2.1) —
-  nao existe variante clara hoje. Os valores abaixo sao os tokens reais da doc,
-  mapeados direto nas variaveis que os componentes shadcn esperam encontrar.
-  Ver docs/VIGIA_DESIGN_SYSTEM_V2.md.
+  Vigia suporta claro e escuro via classe .dark na raiz (ver use-theme.tsx).
+  Paleta V4 (jun/2026): no escuro, fundo quase-preto com leve frieza
+  azulada (#0e1116), 3 camadas de profundidade (fundo -> superficie ->
+  input/hover) para elevacao real; no claro, fundo neutro claro com
+  superficies brancas. Azul institucional como cor de marca em ambos os
+  modos, usado so em pontos de destaque — nunca decoracao ambiente nem cor
+  de superficie/fundo.
 */
 :root {
-  color-scheme: dark;
+  color-scheme: light;
 
-  --background: #0a0a0b;
-  --foreground: #f4f4f3;
-  --card: #0a0a0b;
-  --card-foreground: #f4f4f3;
-  --popover: #15110f;
-  --popover-foreground: #f4f4f3;
-  --primary: #f4f4f3;
-  --primary-foreground: #0a0a0b;
-  --secondary: #1c1c1e;
-  --secondary-foreground: #f4f4f3;
-  --muted: #1c1c1e;
-  --muted-foreground: #9c9c9f;
-  --accent: #1c1c1e;
-  --accent-foreground: #f4f4f3;
-  --destructive: #e24b4a;
-  --destructive-foreground: #f4f4f3;
-  --border: rgba(255, 255, 255, 0.08);
-  --input: rgba(255, 255, 255, 0.12);
-  --ring: rgba(255, 255, 255, 0.2);
+  --background: #dadde3;
+  --foreground: #16191f;
+  --card: #f8f9fb;
+  --card-foreground: #16191f;
+  --popover: #f8f9fb;
+  --popover-foreground: #16191f;
+  --primary: #16191f;
+  --primary-foreground: #f8f9fb;
+  --secondary: #cfd3da;
+  --secondary-foreground: #16191f;
+  --muted: #cfd3da;
+  --muted-foreground: #5b6270;
+  --accent: #cfd3da;
+  --accent-foreground: #16191f;
+  --destructive: #c2514f;
+  --destructive-foreground: #ffffff;
+  --border: #c3c8d1;
+  --input: #b8bdc7;
+  --ring: #a3a9b5;
   --radius: 0.5rem;
 
-  /* Tokens de status — a unica cor de SINAL que existe na interface (secao 2.2) */
-  --color-status-critico: #ff2d2d;
-  --color-status-critico-texto: #ff5c5c;
-  --color-status-atencao: #d9a441;
-  --color-status-bom: #5ba85a;
-  --color-status-bom-texto: #7fb87a;
-  --color-status-neutro: #6b6b6e;
+  /* Tokens de status — a unica cor de SINAL que existe na interface.
+     Mesma intensidade viva usada nos graficos (--color-grafico-*), para
+     que a legenda de saude e os KPIs falem a mesma lingua de cor. */
+  --color-status-critico: #dc2626;
+  --color-status-critico-texto: #dc2626;
+  --color-status-atencao: #d97706;
+  --color-status-bom: #16a34a;
+  --color-status-bom-texto: #16a34a;
+  --color-status-neutro: #6b7280;
 
-  /* Cor de marca (ciano eletrico) — identidade do Vigia, nao e sinal de status.
-     Hue ~178deg, fora do azul saturado de concorrentes (Meta/Stripe/Linear)
-     e fora do verde de status "bom". Saturacao/brilho altos de proposito —
-     remete a tela de radar ligada, "vivo", nao instrumento apagado. Uso:
-     logo, foco de input, linha de tendencia hero, estado ativo de navegacao. */
-  --color-marca: #00e0db;
-  --color-marca-hover: #4ee8e4;
-  --color-marca-glow: #00827e;
+  /* Cor de marca (azul institucional) — identidade do Vigia, nao e sinal
+     de status. Uso raro e deliberado: CTA principal, foco de input,
+     navegacao ativa. Mesma intensidade viva do --color-grafico-azul. */
+  --color-marca: #2563eb;
+  --color-marca-hover: #1d4ed8;
+  --color-marca-texto: #2563eb;
+  --color-marca-fundo: #eef1f9;
 
-  /* Escala de texto (secao 2.1) — alem de foreground/muted-foreground do shadcn */
-  --color-text-terciario: #9c9c9f;
-  --color-text-quaternario: #6b6b6e;
+  /* Escala de texto — alem de foreground/muted-foreground do shadcn */
+  --color-text-terciario: #6b7280;
+  --color-text-quaternario: #9aa0ab;
 
-  --color-border-subtle: rgba(255, 255, 255, 0.06);
+  --color-border-subtle: #eef0f3;
+
+  --color-grafico-positivo: #16a34a;
+  --color-grafico-negativo: #dc2626;
+  --color-grafico-atencao: #d97706;
+  --color-grafico-azul: #2563eb;
+  --color-grafico-neutro: #6b7280;
+
+  /* Sombras de card — bem mais sutis no claro que no escuro, pois preto
+     pesado contra fundo claro le como mancha, nao como elevacao. */
+  --shadow-card: 0 1px 0 rgba(255, 255, 255, 0.6) inset, 0 8px 16px -12px rgba(16, 19, 25, 0.12);
+  --shadow-card-lg: 0 1px 0 rgba(255, 255, 255, 0.6) inset, 0 14px 26px -16px rgba(16, 19, 25, 0.14);
+  --shadow-button: 0 6px 14px -8px rgba(220, 38, 38, 0.35);
+}
+
+.dark {
+  color-scheme: dark;
+
+  --background: #0e1116;
+  --foreground: #e9ebef;
+  --card: #171b22;
+  --card-foreground: #e9ebef;
+  --popover: #1d222b;
+  --popover-foreground: #e9ebef;
+  --primary: #e9ebef;
+  --primary-foreground: #0e1116;
+  --secondary: #1d222b;
+  --secondary-foreground: #e9ebef;
+  --muted: #1d222b;
+  --muted-foreground: #9aa1ad;
+  --accent: #1d222b;
+  --accent-foreground: #e9ebef;
+  --destructive: #c2514f;
+  --destructive-foreground: #e9ebef;
+  --border: #262c36;
+  --input: #11151b;
+  --ring: #2f3742;
+
+  --color-status-critico: #f87171;
+  --color-status-critico-texto: #f87171;
+  --color-status-atencao: #fbbf24;
+  --color-status-bom: #4ade80;
+  --color-status-bom-texto: #4ade80;
+  --color-status-neutro: #9aa1ad;
+
+  --color-marca: #60a5fa;
+  --color-marca-hover: #3b82f6;
+  --color-marca-texto: #60a5fa;
+  --color-marca-fundo: #1e2740;
+
+  --color-text-terciario: #9aa1ad;
+  --color-text-quaternario: #737a86;
+
+  --color-border-subtle: #1d222b;
+
+  /* Cores vivas para graficos — mais saturadas/claras que os tokens de status
+     (que precisam funcionar tambem como texto pequeno). Uso restrito a
+     sparklines/visualizacoes de dados, onde "vivo" ajuda a leitura rapida. */
+  --color-grafico-positivo: #4ade80;
+  --color-grafico-negativo: #f87171;
+  --color-grafico-atencao: #fbbf24;
+  --color-grafico-azul: #60a5fa;
+  --color-grafico-neutro: #9aa1ad;
+
+  --shadow-card: 0 1px 0 rgba(255, 255, 255, 0.04) inset, 0 12px 28px -16px rgba(0, 0, 0, 0.65);
+  --shadow-card-lg: 0 1px 0 rgba(255, 255, 255, 0.05) inset, 0 20px 40px -20px rgba(0, 0, 0, 0.75);
+  --shadow-button: 0 8px 16px -8px rgba(220, 38, 38, 0.6);
 }
 
 @theme inline {
@@ -93,7 +163,14 @@
 
   --color-marca: var(--color-marca);
   --color-marca-hover: var(--color-marca-hover);
-  --color-marca-glow: var(--color-marca-glow);
+  --color-marca-texto: var(--color-marca-texto);
+  --color-marca-fundo: var(--color-marca-fundo);
+
+  --color-grafico-positivo: var(--color-grafico-positivo);
+  --color-grafico-negativo: var(--color-grafico-negativo);
+  --color-grafico-atencao: var(--color-grafico-atencao);
+  --color-grafico-azul: var(--color-grafico-azul);
+  --color-grafico-neutro: var(--color-grafico-neutro);
 
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);

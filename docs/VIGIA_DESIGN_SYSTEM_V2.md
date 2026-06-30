@@ -1,232 +1,221 @@
 # VIGIA — DESIGN SYSTEM V2
 
-**Status:** validado por Benedito em sessão de wireframe (junho/2026); ampliado com a cor de marca e os padrões de tela de Login (junho/2026).
-**Substitui:** a V1 (paleta azul clara com cards/badges coloridos) por uma direção mais madura e premium.
-**Referência de sensação:** Linear / Apple — minimalista no sentido de cada elemento ter peso e propósito, não no sentido de vazio.
+**Status:** reescrito a partir da implementação real do painel (dashboard) — junho/2026. Toda a V2 anterior (paleta ciano elétrico sobre preto puro, modo escuro fixo) foi **descartada por completo** e substituída pelo sistema abaixo, que documenta exatamente o que está implementado em `frontend/src/index.css` e nos componentes do painel.
+**Fonte de verdade:** `frontend/src/pages/dashboard/dashboard-page.tsx` + `frontend/src/index.css`. Qualquer divergência entre este documento e o código deve ser resolvida a favor do código, e este documento atualizado.
 
 ---
 
 ## 1. Princípio central
 
-> A interface não compete por atenção. Ela se afasta para deixar a informação respirar, e quando fala, fala com peso.
+> A interface não compete por atenção. É majoritariamente neutra, e quando uma cor aparece, ela tem um significado único e não-ambíguo.
 
-Quatro regras que vêm antes de qualquer token de cor ou tipografia:
-
-1. **Cor é exceção, não decoração.** A tela é majoritariamente neutra (cinza/branco sobre preto). Cor só aparece em dois tipos de elemento: um sinal de decisão real (crítico, atenção, sucesso) ou a identidade de marca (ver regra 4). Se tudo tem cor, nada tem prioridade.
-2. **Hierarquia de atenção, não densidade de informação.** Nunca mostrar 4+ blocos competindo por atenção ao mesmo tempo. Sempre existe uma coisa que é a mais importante da tela — ela recebe o maior peso visual (tamanho, posição), o resto fica visualmente recuado.
-3. **Indicador de status é linha, não bolinha/badge.** Uma barra vertical fina (3px) à esquerda do item, não um círculo colorido nem uma pill com fundo colorido. Comunica "instrumento de precisão", não "app consumer".
-4. **Status e marca nunca se confundem.** Existem exatamente duas famílias de cor no produto: cor de **status** (crítico/atenção/bom — comunica um estado de dado) e cor de **marca** (ciano elétrico — comunica identidade/ação do produto, não um estado). Um elemento nunca usa a cor de marca para sinalizar status, nem a cor de status para decorar algo que não é um estado real.
+1. **Cor é exceção, não decoração.** O fundo e as superfícies são sempre neutros (cinza). Cor só aparece em números, ícones de status, barras de estado e na identidade de marca.
+2. **Cada cor tem exatamente um significado, nunca dois.** Azul = identidade/marca OU investimento (nunca os dois ao mesmo tempo no mesmo contexto). Verde = bom/dentro da meta. Vermelho = crítico/fora da meta. Âmbar = atenção. Cinza = neutro/sem sinal. Uma cor nunca é reaproveitada com sentido diferente em telas próximas — foi exatamente o erro corrigido nesta sessão (Faturamento usava azul só por ser "dinheiro", colidindo com o significado de marca).
+3. **Indicador de status é linha, não bolinha/badge.** Uma barra vertical fina à esquerda do item — em cards de projeto/alerta, 1px de largura colorida; nunca círculo ou pill com fundo saturado competindo com o conteúdo.
+4. **Suporte a tema claro e escuro, com a mesma vivacidade de cor nos dois.** Cada token de cor de sinal (status, marca, gráfico) tem um par claro/escuro calibrado para ter a mesma intensidade percebida — nunca "vivo no escuro, apagado no claro".
+5. **Intensidade de cor segue a lógica dos gráficos.** A paleta `--color-grafico-*` (mais viva/saturada, pensada para leitura rápida em linha fina) é a referência de intensidade para toda cor de sinal do produto — incluindo números de KPI e tokens de status. Não existem dois níveis de "verde" ou "vermelho" na interface.
 
 ---
 
 ## 2. Cor
 
-### 2.1. Base (neutros — modo escuro é o padrão)
+Todos os tokens vivem em `frontend/src/index.css`, declarados em `:root` (claro) e `.dark` (escuro), expostos ao Tailwind via `@theme inline`.
 
-| Token | Hex | Uso |
-|---|---|---|
-| Fundo do app | `#0A0A0B` | Fundo principal de painéis/cards |
-| Fundo elevado | `#15110F` | Fundo de alertas/destaques pontuais (uso raro) |
-| Fundo de superfície secundária | `#1C1C1E` | Botões secundários, avatar placeholder |
-| Texto primário | `#F4F4F3` | Títulos, valores, nomes — o "branco" da paleta |
-| Texto secundário | `#D4D4D6` | Texto de apoio com alguma importância |
-| Texto terciário | `#9C9C9F` | Labels, metadados, texto de apoio padrão |
-| Texto quaternário (mais apagado) | `#6B6B6E` | Eyebrows, timestamps, texto quase decorativo |
-| Borda padrão | `rgba(255,255,255,0.08)` | Divisores entre seções, bordas de card |
-| Borda sutil (entre linhas de lista) | `rgba(255,255,255,0.06)` | Divisores internos de tabela/lista |
-| Borda de input/botão secundário | `rgba(255,255,255,0.10–0.12)` | Contorno de botões "Ignorar" e similares |
+### 2.1. Base / neutros
+
+| Token | Claro | Escuro | Uso |
+|---|---|---|---|
+| `--background` | `#dadde3` | `#0e1116` | Fundo do app, atrás dos cards |
+| `--card` | `#f8f9fb` | `#171b22` | Fundo de card/painel — sempre mais claro/elevado que o background no claro, e vice-versa no escuro real |
+| `--foreground` | `#16191f` | `#e9ebef` | Texto primário |
+| `--secondary` / `--muted` / `--accent` | `#cfd3da` | `#1d222b` | Superfície secundária (hover de nav, fundo de badge sutil) |
+| `--muted-foreground` | `#5b6270` | `#9aa1ad` | Texto apagado padrão (shadcn) |
+| `--border` | `#c3c8d1` | `#262c36` | Bordas de card, divisores |
+| `--color-text-terciario` | `#6b7280` | `#9aa1ad` | Labels, metadados |
+| `--color-text-quaternario` | `#9aa0ab` | `#737a86` | Texto quase decorativo (rodapé de card, eyebrow apagado) |
+
+O claro **não é um cinza neutro único**: `--background` e `--card` são deliberadamente separados por um salto de luminosidade perceptível (não apenas 2-3% de diferença), para que a hierarquia fundo→superfície exista de verdade — um ajuste feito nesta sessão depois de identificar que a primeira versão do claro estava "lavada" (fundo e card quase indistinguíveis).
 
 ### 2.2. Status (a cor que comunica estado de dado)
 
-| Estado | Hex (linha/texto) | Quando usar |
+Os 4 estados de saúde de campanha — únicos consumidores legítimos desta paleta:
+
+| Estado | Claro | Escuro | Quando usar |
+|---|---|---|---|
+| Crítico | `#dc2626` | `#f87171` | Fora da meta, exige ação |
+| Atenção | `#d97706` | `#fbbf24` | Aproximando de um limite |
+| Bom | `#16a34a` | `#4ade80` | Dentro/acima da meta |
+| Neutro | `#6b7280` | `#9aa1ad` | Aprendendo, pausado, sem sinal de mérito |
+
+Tokens: `--color-status-critico`, `--color-status-atencao`, `--color-status-bom`, `--color-status-neutro` (+ variantes `-texto` para crítico/bom, usadas quando o texto precisa do mesmo tom da barra).
+
+**Regra de aplicação:** a barra lateral de uma linha/card usa a cor cheia (`bg-status-*`); o texto ao lado usa a variante `-texto` só quando o número precisa comunicar o mesmo estado (ex.: "0 críticas" em vermelho). Itens neutros não precisam de cor no texto.
+
+### 2.3. Marca (identidade do produto — azul institucional)
+
+| Token | Claro | Escuro | Uso |
+|---|---|---|---|
+| `--color-marca` | `#2563eb` | `#60a5fa` | Logo, CTA de navegação, foco de input |
+| `--color-marca-hover` | `#1d4ed8` | `#3b82f6` | Hover de elementos de marca |
+| `--color-marca-texto` | `#2563eb` | `#60a5fa` | Texto/ícone na cor de marca (lockup do logo, item ativo da sidebar) |
+| `--color-marca-fundo` | `#eef1f9` | `#1e2740` | Fundo sutil tingido de marca (badge, destaque de card) |
+
+**Onde aparece:** lockup "VIGIA" + ícone na sidebar (`app-sidebar.tsx`), item de navegação ativo, KPI "Investido" (ver 2.5 — é a única métrica numérica que usa a cor de marca, porque investimento é "operação do produto", não um resultado bom/ruim).
+**Onde não aparece:** nunca em um número que representa um resultado de campanha (Faturamento, Lucro líquido, CPL, ROAS) — esses usam exclusivamente a paleta de status/gráfico, para não colidir com o significado de "marca" e com o estado "aprendendo" da legenda de saúde (que também é azul).
+
+Esta separação `--color-marca-*` vs `--color-status-*` é arquitetural e deliberada: são dois sistemas de tokens independentes, mesmo quando o tom de azul é visualmente parecido com o `neutro` ou usado perto da legenda — nunca compartilham variável.
+
+### 2.4. Gráfico (paleta viva — fonte de intensidade)
+
+| Token | Claro | Escuro |
 |---|---|---|
-| Crítico | `#E24B4A` (linha) / `#E89593` (texto sobre fundo escuro) | Desvio que exige ação imediata |
-| Atenção | `#D9A441` (linha) | Aproximando de um limite, ainda não crítico |
-| Bom / saudável | `#5BA85A` ou `#7FB87A` (texto) | Dentro ou acima da meta |
-| Neutro / inativo | `#6B6B6E` ou `#8A8A8D` | Pausado, arquivado, sem dado |
+| `--color-grafico-positivo` | `#16a34a` | `#4ade80` |
+| `--color-grafico-negativo` | `#dc2626` | `#f87171` |
+| `--color-grafico-atencao` | `#d97706` | `#fbbf24` |
+| `--color-grafico-azul` | `#2563eb` | `#60a5fa` |
+| `--color-grafico-neutro` | `#6b7280` | `#9aa1ad` |
 
-**Regra de aplicação:** a cor de status vive na barra lateral de 3px e, quando o número também precisa comunicar o mesmo estado, no texto do número (nunca em fundo colorido/badge). Itens em estado "bom" ou "neutro" não precisam de cor no texto — só a linha já basta; reservar cor no texto para crítico/atenção, que são os estados que pedem ação.
+Esta paleta é numericamente idêntica à de status (mesmos hex) — a unificação aconteceu nesta sessão depois de identificar que os KPIs (que usavam `--color-grafico-*`) estavam mais vivos que a legenda "Saúde das campanhas" (que usava uma paleta antiga, mais apagada). Em vez de enfraquecer os KPIs, a legenda foi promovida à mesma intensidade — `--color-status-*` passou a usar os mesmos valores de `--color-grafico-*`. Os dois grupos de token continuam existindo separadamente por motivo semântico (status = estado de dado discreto; gráfico = série contínua), não por diferença de cor.
 
-### 2.3. Marca (a cor que comunica identidade/ação do produto — ciano elétrico)
+### 2.5. Cor por KPI (regra específica do grid de métricas do dashboard)
 
-Cor de marca não é uma decoração opcional nem um apêndice da paleta: é a segunda família de cor prevista pela regra 1.4, com função própria e distinta de status.
+Cada um dos 5 KPIs do topo do painel (`Investido`, `Faturamento`, `Lucro líquido`, `CPL médio`, `ROAS médio`) tem exatamente um significado de cor, nunca dividido com outro KPI:
 
-| Token | Hex | Uso |
+| KPI | Cor | Por quê |
 |---|---|---|
-| `--color-marca` | `#00E0DB` | Logo, foco de input, CTA primário, linha de tendência hero, estado ativo de navegação |
-| `--color-marca-hover` | `#4EE8E4` | Hover de elementos `marca` (botão, links) |
-| `--color-marca-glow` | `#00827E` | Tom escurecido da marca — usado em glows/gradientes, nunca sólido em texto |
+| Investido | Azul (`text-grafico-azul`) | Não tem meta nem direção "boa/ruim" — é a única métrica de identidade/operação, não de resultado |
+| Faturamento | Verde/vermelho dinâmico por tendência (`direcaoBoa="subir"`) | É um resultado de campanha — segue a mesma lógica de Lucro líquido/CPL/ROAS, não a cor de marca |
+| Lucro líquido | Verde (`text-grafico-positivo`) | Resultado positivo no período |
+| CPL médio | Âmbar quando acima da meta (`text-grafico-atencao`) | Custo por lead acima do benchmark |
+| ROAS médio | Verde quando acima da meta (`text-grafico-positivo`) | Retorno batendo a meta |
 
-**Por que esse hue:** ~178°, deliberadamente fora do azul saturado de concorrentes (Meta/Stripe/Linear) e fora do verde de status "bom" (`#5BA85A`) — a distância de hue entre marca e status "bom" é proposital, para que as duas cores nunca sejam confundidas mesmo em uso rápido/periférico. Saturação e brilho altos de propósito: remete a "tela de radar ligada", instrumento vivo, não apagado.
+Essa tabela existe porque, ao longo da sessão, tentamos por duas vezes dar a um KPI uma cor "emprestada" de outro significado (Faturamento em azul só por ser dinheiro; Investido em cinza apagado por padrão, depois cogitado em azul pelo motivo errado) — a régua final foi: **a cor descreve o que o número É (identidade vs. resultado), nunca o que ele parece** (dinheiro, ROI etc.).
 
-**Onde a marca aparece vs. onde não aparece:**
-- Aparece: logo, foco de campo de formulário, CTA primário de telas de entrada (login/cadastro), navegação ativa, linha de tendência no hero do painel.
-- Não aparece: qualquer lugar que hoje usa a paleta de status (seção 2.2) para indicar crítico/atenção/bom — trocar status por marca quebraria a regra 1.4 e removeria o sinal de prioridade do produto.
+### 2.6. Sombra (tema-aware, não hardcoded)
 
-### 2.4. O que foi descartado da V1
-- Badges com fundo colorido (`#E1F5EE`, `#FAEEDA`, `#FCEBEB` etc.) — geravam a sensação "app infantil"
-- Bolinha de status colorida — substituída pela linha de 3px
-- Grid de métrica em 4 colunas com fundo claro — a contagem de colunas e a cor de fundo da V1 foram descartadas, mas a ideia de "card de métrica com fundo de superfície" foi reabilitada na V2 (seção 5.6), só que com o fundo de superfície escuro do token `--secondary` (`#1C1C1E`), nunca um cinza-claro
+```css
+/* :root (claro) — sutil, pois preto pesado sobre fundo claro lê como mancha */
+--shadow-card:    0 1px 0 rgba(255,255,255,0.6) inset, 0 8px 16px -12px rgba(16,19,25,0.12);
+--shadow-card-lg: 0 1px 0 rgba(255,255,255,0.6) inset, 0 14px 26px -16px rgba(16,19,25,0.14);
+--shadow-button:  0 6px 14px -8px rgba(220,38,38,0.35);
+
+/* .dark — mais profunda, pois o fundo já é escuro */
+--shadow-card:    0 1px 0 rgba(255,255,255,0.04) inset, 0 12px 28px -16px rgba(0,0,0,0.65);
+--shadow-card-lg: 0 1px 0 rgba(255,255,255,0.05) inset, 0 20px 40px -20px rgba(0,0,0,0.75);
+--shadow-button:  0 8px 16px -8px rgba(220,38,38,0.6);
+```
+
+Consumidos via `shadow-[var(--shadow-card)]` (Tailwind arbitrary value). Nunca usar um valor de sombra hardcoded fora desses 3 tokens — foi exatamente o problema corrigido nesta sessão (sombras escuras fixas ficavam pesadas demais no tema claro).
 
 ---
 
 ## 3. Tipografia
 
-**Fonte:** Inter (mantida da V1 — já era uma escolha correta; nenhuma fonte nova foi introduzida desde então, incluindo no lockup de logo).
+**Fonte:** Inter (`@fontsource-variable/inter`).
 
-| Nível | Tamanho | Peso | Cor | Uso |
-|---|---|---|---|---|
-| Número hero | 64px (`text-[64px]`) | 600 | Texto primário | O destaque único do topo do painel ("2 campanhas em desvio") — revisado de 44px/500 para dar mais peso real ao número que mais importa na tela |
-| Número de card de métrica | 36px (`text-4xl`) | 600 | Texto primário | Valor em destaque dentro do card de métrica (seção 5.6) — revisado de 26px/500 |
-| Título de seção | 14px | 500 | Texto primário | Nome do app, títulos de tela |
-| Corpo / item de lista | 13px | 400 | Texto primário ou secundário | Nome de campanha, conteúdo principal de linha |
-| Apoio / metadado | 12px | 400 | Texto terciário (#9C9C9F) | CPL, ROAS ao lado do nome, descrição de gatilho |
-| Eyebrow (label de seção) | 12px | 400, uppercase, letter-spacing 0.6px | Texto quaternário (#6B6B6E) | "VISÃO GERAL · HOJE", "PRECISA DA SUA ATENÇÃO" |
-| Eyebrow de campo de formulário | 12px (`text-xs`) | 600, uppercase, letter-spacing wide | Cor de marca (`#00E0DB`) | Label de input em telas de entrada ("EMAIL", "SENHA") — variante do eyebrow acima, usa peso 600 e cor de marca por estar associada a um campo ativo/editável, não a um metadado passivo |
-| Lockup de logo | 16px (`text-base`) | 600 | Texto primário | Nome "VIGIA" ao lado do ícone — único outro uso de peso 600 no sistema |
-| Microtexto | 11px | 400 | Texto quaternário | Notas de rodapé, disclaimers de regra de negócio |
+| Nível | Tamanho | Peso | Uso |
+|---|---|---|---|
+| Número hero (alerta/OK do painel) | `text-7xl` (72px) | 700 | O número que mais importa na tela — "2 de 4 campanhas fora da meta" ou o ícone de check do estado OK |
+| Número de KPI | `text-2xl` (24px) | 700 | Valor de cada card do grid de métricas |
+| Headline de estado OK | `text-2xl` (24px) | 700 | "Todas as suas campanhas estão OK" |
+| Nome de projeto / título de página | `text-xl` (20px) | 600 | Header do dashboard, título "Meus projetos" |
+| Nome de campanha / item de lista | `text-sm` (14px) | 500 | Coluna principal da tabela de campanhas |
+| Label de KPI / metadado | `text-xs` (12px) | 500 | "Investido", "de R$ 800 orçados" |
+| Eyebrow (label de seção) | `text-xs` (12px), uppercase, `tracking-wide` | 600 | "TUDO SOB CONTROLE", "PRECISA DA SUA ATENÇÃO", "SAÚDE DAS CAMPANHAS" |
+| Lockup de logo | `text-lg` (18px) | 600 | "VIGIA" ao lado do ícone |
 
-**Regras:**
-- Pesos permitidos no corpo do produto: 400 e 500 para texto corrido (nunca 700). Peso 600 é reservado a números de destaque (hero do painel, valor do card de métrica) e aos dois usos originais (lockup de logo, eyebrow de campo de formulário) — nunca aplicado a títulos de seção ou texto de corpo comuns. A regra continua: 600 marca "isto é o número/identidade que importa", não é um recurso geral de ênfase.
-- Sentence case sempre — eyebrows são a exceção (uppercase), e mesmo assim com letter-spacing largo para não parecer grito.
-- Contraste de escala > contraste de cor: para indicar "isso é importante", aumentar o tamanho da fonte primeiro, usar cor como segundo recurso. Cor de marca em texto (como no eyebrow de campo) é aceitável porque comunica "isto é um campo ativo da marca", não "isto é importante" — não usar cor de marca como atalho geral de ênfase.
+Regra geral: peso 700 reservado a números/headlines de destaque real (o que a tela quer que o olho ache primeiro); peso 500-600 para tudo que é label ou navegação; nunca peso 400 em texto de UI funcional (corpo neutro do produto usa 500 como piso).
 
 ---
 
 ## 4. Layout e espaçamento
 
-- **Estrutura de seção:** blocos de conteúdo do painel interno usam dois níveis de card — o card sutil (fundo igual ao app, seção 5.6, usado para agrupar listas/conteúdo) e o card de métrica (fundo de superfície `--secondary`, seção 5.6, usado para números isolados que merecem destaque próprio). Nenhum dos dois usa cinza-claro ou sombra pesada.
-- **Padding generoso:** 24px nas laterais das seções principais, 18-24px verticalmente entre blocos
-- **Divisores:** 0.5px, `rgba(255,255,255,0.08)` entre seções grandes; `rgba(255,255,255,0.06)` entre itens de uma mesma lista (mais sutil ainda)
-- **Grids de cards de métrica:** 3-4 colunas, `gap-4`, cada card com seu próprio fundo de superfície e `border-radius` (`--radius-lg`) — não mais separados por linha de 1px sem fundo (regra revista; ver seção 5.6)
-- **Linha de status:** sempre 3px de largura, altura ajustada à linha do item (16-18px em linha de lista, ~28-38px em card de alerta), `border-radius: 0` (é um traço, não uma pill)
+- **Sidebar:** `w-64` (256px), fundo igual ao app, separada por `border-r border-border`. Lockup logo+nome no topo, seguido por uma **divisória horizontal** (`h-px bg-border`) antes do menu de navegação — adicionada nesta sessão para separar visualmente identidade de navegação.
+- **Cards do painel:** um único tipo de card sutil (`PainelCard` / `KpiCard`) — fundo `bg-card`, borda `border-border`, sombra `shadow-[var(--shadow-card)]`, `rounded-lg`/`rounded-xl`. Não existe um segundo tipo de "card de métrica com fundo de superfície diferente" — todos os cards do painel compartilham o mesmo tratamento visual, diferenciados por conteúdo e tamanho, não por skin.
+- **Grid de KPIs:** 5 colunas (`grid-cols-5`), `gap-3`.
+- **Card de projeto (tela "Meus projetos"):** grid de 3 colunas, `gap-4`, cada card com barra lateral de estado (verde/vermelho) + nome + nicho + 2 métricas (Investido, ROAS) + rodapé com pill de saúde resumido.
+- **Divisores:** `border-border` (1px) entre seções; nada mais sutil que isso é usado hoje — não há um segundo tom de borda "quase invisível".
 
 ---
 
-## 5. Componentes-padrão já validados (painel interno)
+## 5. Componentes-padrão (estado real)
 
-### 5.1. Bloco de destaque único (hero do painel)
-Eyebrow pequeno → número grande (44px/500) + texto de apoio na mesma linha (baseline) → uma linha de contexto abaixo em texto terciário.
+### 5.1. Hero do painel — dois estados permanentes
 
-### 5.2. Card de alerta crítico
-Fundo levemente diferenciado (`#15110F`), borda sutil na cor do estado (ex: `rgba(226,75,74,0.25)`), barra lateral de 3px na cor cheia, conteúdo + CTA textual à direita (não botão grande — um link discreto tipo "ver diagnóstico").
+O dashboard tem dois estados visuais completos e ambos estão implementados e visíveis (alternando por filtro de período, ver `dados-mock.ts`):
 
-### 5.3. Linha de lista (campanha, item de fila)
-Barra de status (3px) + texto primário (nome) + texto secundário/terciário alinhado à direita (métrica) + ícone de ação discreto (chevron ou dots) — tudo numa única linha horizontal, sem quebra, sem padding excessivo.
+**Estado de alerta** (`campanhasEmDesvio > 0`):
+- Borda `border-status-critico/40`, barra lateral 1px `bg-status-critico`, fundo `bg-card`, sombra `shadow-card-lg`.
+- Eyebrow vermelho "PRECISA DA SUA ATENÇÃO".
+- Número gigante (`text-7xl`, 700) na cor crítica + texto de apoio em `text-foreground` na mesma linha.
+- Texto de contexto + botão de ação sólido na cor crítica (`bg-status-critico`, texto branco, `shadow-[var(--shadow-button)]`) — não um link discreto; aqui o CTA é a ação primária da tela.
 
-### 5.4. Botões em fila de aprovação
-- **Ação primária (Aprovar):** fundo sólido claro (`#F4F4F3`), texto escuro (`#0A0A0B`), sem borda — única coisa "sólida" na tela, isso é proposital, marca claramente onde está a decisão de peso
-- **Ação secundária (Ignorar):** fundo transparente, borda sutil (`rgba(255,255,255,0.12)`), texto terciário
+**Estado "tudo OK"** (`campanhasEmDesvio === 0`):
+- Mesma estrutura de card, borda/barra em `status-bom`.
+- Eyebrow verde "TUDO SOB CONTROLE".
+- `CheckCircle2` (Lucide, `size-12`) + headline "Todas as suas campanhas estão OK" em vez do número.
+- Linha de apoio com o lucro líquido do período.
 
-**Nota de distinção:** este botão primário (claro/texto escuro, sóbrio) é o padrão do *painel interno*. Telas de entrada (login/cadastro) usam um botão primário diferente, com cor de marca — ver seção 7.5. As duas regras coexistem porque resolvem problemas diferentes: dentro do painel, a sobriedade é o sinal de "decisão de peso"; numa tela de entrada, a marca é o sinal de "isto é o produto falando com você".
+### 5.2. Card "Saúde das campanhas" (legenda)
 
-### 5.5. Sidebar de navegação (painel interno)
-Coluna fixa à esquerda, fundo igual ao app (`#0A0A0B`), separada do conteúdo por uma única borda vertical de 0.5px (`rgba(255,255,255,0.08)`) — não é um painel "elevado" com fundo diferente. Dimensionada para ser o "mapa" confortável da aplicação, não uma tira estreita de ícones:
-- Largura: `w-64` (256px) — espaço suficiente para ícone + label sem apertar.
-- Lockup logo+nome (seção 6.2) no topo da sidebar, em escala um pouco maior que o padrão de telas de entrada (`size-7`/`text-lg`), já que aqui é o único lockup da tela.
-- Item de navegação: ícone (Lucide, `size-[18px]`) + label (14px/500), padding `px-3 py-2.5`, `rounded-lg`, `text-text-terciario` em repouso — itens grandes o bastante para parecerem clicáveis à distância, não uma lista densa de texto pequeno.
-- Item ativo: fundo `bg-marca/10`, texto em `text-foreground`, ícone em `text-marca` (a marca aqui sinaliza *navegação ativa/identidade do produto*, conforme regra 1.4/2.3 — não é um estado de dado). Uma barra de 2px à esquerda do item, na cor de marca, reforça o item ativo — não confundir com a linha de status de 3px da seção 1.3, que é exclusiva para estado de dado (crítico/atenção/bom/neutro).
-- Hover (item inativo): `bg-muted/50`, sem mudança de cor de texto.
-- Itens ainda sem tela própria implementada (ex.: Aprovações antes de M4 ter página dedicada, Configurações) aparecem normalmente na lista — não ficam ocultos nem com aparência "desabilitada" — mas a tela de destino mostra um estado vazio claro ("Em construção") em vez de simular dados que não existem.
+Mini-grid de barras de progresso (uma por estado: crítica/atenção/saudável/aprendendo) + contagem numérica abaixo, em duas colunas. Usa exatamente os tokens de `--color-status-*` — nenhuma cor própria.
 
-### 5.6. Cards do painel interno
-Dois tipos de card coexistem no painel, cada um com um papel diferente — não são intercambiáveis:
+### 5.3. KpiCard (`components/shared/kpi-card.tsx`)
 
-**Card sutil** (agrupamento de conteúdo — listas, hero textual): fundo igual ao fundo do app (`#0A0A0B`), borda 0.5px `rgba(255,255,255,0.08)` (a borda padrão da seção 2.1), sem sombra, `border-radius` no token padrão (`--radius-lg`). Cabeçalho de card (quando existir): eyebrow (seção 3) + ação opcional alinhada à direita — nunca título com peso 600. Usado para a lista de campanhas e qualquer bloco que precise só de agrupamento, sem chamar atenção para si.
+Estrutura: label (`text-xs`) → valor animado via count-up (`text-2xl`/700, cor conforme tabela 2.5) → linha de rodapé (variação % ou meta) → sparkline SVG customizado (`components/shared/sparkline.tsx`) com gradiente de preenchimento na mesma cor do traço.
 
-**Card de métrica** (número isolado em destaque — grid de KPIs no topo do painel): fundo de superfície (`--secondary`, `#1C1C1E`), `border-radius` generoso (`rounded-2xl`, maior que o token padrão de card — este componente é deliberadamente mais "redondo e confortável" que o card sutil, para comunicar "isto é um número para ler rápido", não "isto é uma tabela densa"). Padding generoso (`px-6 py-6`). Estrutura interna: eyebrow uppercase (12px/500, `text-text-terciario`) na linha superior, com um badge de ícone (`size-9`, `rounded-xl`, fundo translúcido na cor do tom do card — ver abaixo — não mais um badge neutro cinza) alinhado à direita da mesma linha; abaixo, o valor em destaque grande (`text-4xl`/600, sempre `text-foreground` — o badge de ícone já carrega o tom de cor, o número em si fica neutro para não competir); opcionalmente, uma linha de apoio (`text-sm`, `text-text-quaternario`) abaixo do valor. Usado em grids de 3 colunas (`gap-6`) no topo do painel.
+A cor do número é **sempre estática por prop** (`corValor`), nunca computada dinamicamente dentro do componente — a decisão de qual cor usar é responsabilidade de quem instancia o card (`dashboard-page.tsx`), seguindo a tabela 2.5. Essa escolha foi revertida de uma tentativa anterior de cor 100% dinâmica dentro do componente, por ser overengineering para o que a tela precisa hoje.
 
-O badge de ícone de cada card de métrica usa um "tom" (`marca` / `crítico` / `atenção` / `bom` / `neutro`) escolhido pelo significado do KPI — ex.: investimento usa tom `marca` (é sobre a operação do produto), CPL usa o tom de status correspondente ao seu desvio atual, ROAS idem. Isso é uma aplicação pontual e contida da cor (somente no badge pequeno, nunca no número grande nem no fundo do card inteiro) — mantém a regra 1.1 (cor é exceção) porque o uso é sempre no mesmo elemento pequeno e previsível, nunca espalhado.
+### 5.4. Linha de lista (tabela de campanhas)
 
-Em ambos os tipos de card, a regra 1.2 (hierarquia de atenção) continua valendo: um card não é desculpa para empilhar blocos de mesmo peso visual. O hero do painel (seção 5.1) ganhou escala própria nesta revisão — o número principal sobe para `text-[64px]`/600 (era 44px/500) para manter a distância de peso visual em relação aos cards de métrica, que agora também são bem mais presentes do que na primeira versão deste componente.
+Barra de status (1px, cor do estado) + nome da campanha + KPI principal + barra de progresso vs. benchmark + investido — uma linha horizontal por campanha, sem badges, sem fundo alternado.
+
+### 5.5. Sidebar de navegação
+
+- Lockup logo+ícone em `text-marca-texto` (não mais neutro — alterado nesta sessão para dar identidade real à marca).
+- Divisória horizontal abaixo do lockup.
+- Item de navegação ativo: borda esquerda `border-marca`, fundo `bg-secondary`, ícone `text-marca-texto`.
+- Item inativo: `text-text-terciario`, hover `bg-muted/50`.
+- Rodapé fixo "Monitorando 24h" com dot pulsante em `bg-marca-texto`.
+
+### 5.6. Card de projeto (`pages/projetos/projetos-page.tsx`)
+
+Grid de cards na camada global (fora de qualquer projeto), cada um:
+- Barra lateral 1px: verde se `campanhasEmDesvio === 0`, vermelho caso contrário.
+- Nome do cliente (700) + nicho (`text-text-terciario`, `text-xs`).
+- Duas métricas lado a lado: Investido (mês) e ROAS médio.
+- Rodapé com contagem de campanhas ativas + pill resumido de saúde ("tudo ok" ou "N precisam atenção"), nunca a legenda completa de 4 estados — a tela de lista é um resumo, não um diagnóstico.
+- Último item do grid é um card tracejado "Criar novo projeto", sempre presente (não some quando há outros projetos).
+- Estado vazio (zero projetos): painel centralizado tracejado substituindo o grid inteiro, com ícone, headline e CTA.
+
+### 5.7. Modal de criar projeto (`features/projetos/criar-projeto-dialog.tsx`)
+
+Construído sobre um primitivo `Dialog` próprio (`components/ui/dialog.tsx`, Base UI), não um componente shadcn genérico — segue a mesma linha visual dos cards (`bg-card`, `border-border`, `shadow-card-lg`). 4 campos batendo 1:1 com o `ConectarProjetoDto` do backend: nome do cliente, nicho, Ad Account ID, Access Token (campo `password`). Botão primário em `bg-marca` (ação de criar/conectar, não um resultado de status).
 
 ---
 
 ## 6. Logo e identidade de marca
 
-### 6.1. Construção do logo
-- Ícone vetorizado (lighthouse/sentinela), sem wordmark embutido — o nome "VIGIA" é tipografado ao lado em Inter peso 600 (ver seção 3), nunca faz parte do arquivo SVG do ícone.
-- Dois formatos do mesmo path, cada um com um propósito:
-  - **Asset estático** (`frontend/src/assets/vigia-logo.svg`, copiado em `frontend/public/favicon.svg`): cor cravada em `fill="#00E0DB"` — usado como favicon e em qualquer contexto fora de componente React, onde não há `currentColor` para herdar.
-  - **Componente React** (`frontend/src/components/shared/vigia-logo.tsx`): mesmo path com `fill="currentColor"`, herda cor via classe Tailwind (`text-marca`) — usado dentro de telas, para poder variar de cor por contexto se necessário no futuro.
-- `viewBox="10 11 176 184"` — bounding box exato do traçado, sem padding assimétrico entre os lados.
-
-### 6.2. Lockup logo + nome
-Ícone (tamanho `size-8`–`size-9`) + espaço (`gap-2`) + "VIGIA" em Inter 600, `text-base`, `tracking-wide`. Em telas internas do painel ainda não há posição fixa definida; em telas de entrada, vive no topo da coluna de formulário (ver 7.1).
+- Ícone vetorizado, sem wordmark embutido — "VIGIA" é tipografado ao lado em Inter 600.
+- Componente React (`components/shared/vigia-logo.tsx`): `fill="currentColor"`, herda cor via classe Tailwind — hoje sempre `text-marca-texto` no lockup da sidebar e da tela de projetos.
+- Asset estático (`assets/vigia-logo.svg`, `public/favicon.svg`): cor cravada, usado fora de componente React.
 
 ---
 
-## 7. Padrões de tela de entrada (Login — referência validada)
+## 7. Arquitetura de camadas (produto)
 
-A tela de Login (`frontend/src/pages/login/login-page.tsx`) é a primeira aplicação completa da V2 com cor de marca, e fixa o conjunto de padrões abaixo como referência para outras telas públicas/de entrada (cadastro, recuperação de senha).
+Esta seção documenta uma decisão estrutural fixada nesta sessão, não apenas visual:
 
-### 7.1. Estrutura
-Duas colunas em telas grandes (`lg:grid-cols-2`), uma coluna em mobile:
-- **Coluna de vitrine** (esquerda, oculta em mobile): fundo `#0A0A0B`, mockup vivo do produto — não é arte estática, é um recorte real da UI (card de métrica + linha de status) traduzido em linguagem humana, não em jargão técnico.
-- **Coluna de formulário** (direita): lockup logo+nome no topo (seção 6.2), heading, formulário, e um rodapé de transição para cadastro.
-
-### 7.2. Glow e grid de fundo (coluna de vitrine)
-Dois efeitos de fundo sobrepostos, ambos na cor de marca (nunca branco neutro):
-```css
-/* Glow radial duplo */
-radial-gradient(circle at 15% 15%, rgba(0,224,219,0.32), transparent 55%),
-radial-gradient(circle at 85% 75%, rgba(0,224,219,0.16), transparent 55%)
-
-/* Grid de fundo */
-linear-gradient(rgba(0,224,219,0.5) 1px, transparent 1px),
-linear-gradient(90deg, rgba(0,224,219,0.5) 1px, transparent 1px)
-/* background-size: 40px 40px; opacidade do container: 0.14 */
-```
-A intensidade desses valores foi calibrada para que a marca tenha presença visual sem virar decoração gratuita — ajustar opacidade antes de considerar trocar o hue.
-
-### 7.3. Animação de entrada — "Reveal cinematográfico"
-Efeito padrão para qualquer tela de entrada/primeira impressão (não usar em telas internas do painel, onde a regra é instrumento sóbrio, sem floreio). Blur-to-focus + leve escala, não fade/slide simples:
-```css
-@keyframes cinematic-reveal {
-  from { opacity: 0; filter: blur(14px); transform: scale(1.04); }
-  to   { opacity: 1; filter: blur(0);    transform: scale(1); }
-}
-.animate-cinematic-reveal {
-  animation: cinematic-reveal 1100ms cubic-bezier(0.16, 1, 0.3, 1) both;
-}
-```
-Os blocos da tela disparam em cascata via `animationDelay` inline (lockup `0ms`/coluna do form `160ms`, headline da vitrine `100ms`, card de métrica `220ms`, rodapé `340ms`) — staggering de ~100–120ms entre elementos, nunca simultâneo.
-
-### 7.4. Estado de foco de input
-Substitui o `ring` genérico do shadcn por um foco com identidade de marca, em quatro camadas simultâneas:
-- Borda sólida na cor de marca (`focus-visible:border-marca`)
-- Fundo levemente tingido (`focus-visible:bg-marca/[0.06]`)
-- Sombra em duas camadas — anel fino + glow externo difuso: `0 0 0 3px rgba(0,224,219,0.18), 0 0 20px -4px rgba(0,224,219,0.5)`
-- Caret do cursor de texto também na cor de marca (`caret-marca`)
-
-Cada input tem um ícone à esquerda (Lucide, `size-4`, cor `text-text-quaternario` em repouso) indicando o tipo de campo — não decorativo, ajuda escaneabilidade em formulários curtos. Label do campo segue o eyebrow de formulário da seção 3 (uppercase, peso 600, cor de marca).
-
-### 7.5. Botão primário de tela de entrada (CTA de submit)
-Diferente do botão primário do painel interno (seção 5.4). Não é cor sólida — é gradiente diagonal + glow externo sutil (sem inset, sem "brilho lavado"):
-```css
-background: linear-gradient(135deg, #00E0DB 0%, #00B8B3 100%);
-box-shadow: 0 0 28px rgba(0,224,219,0.25);
-/* estado pending: background rgba(0,224,219,0.3), sem box-shadow */
-```
-Texto sempre branco (`#FFFFFF`), nunca preto — ao contrário do botão primário do painel. A diferença é deliberada: o botão de painel é "decisão de peso visualmente sóbria" (regra 5.4), o CTA de login é "ação de entrada com identidade de marca" (regra 1.4 aplicada).
-
-Durante `isPending`, o texto é substituído por spinner SVG (`animate-spin`, `viewBox 0 0 24 24`, traço com `opacity 0.25` no anel base e `0.75` no arco ativo) + label de progresso ("Entrando...") — nunca apenas desabilitar o botão sem feedback visual.
-
-### 7.6. Microinterações de botão/link
-- Todo elemento clicável (`<button>`) recebe `cursor-pointer` explícito — o reset do design system zera o cursor nativo, então isso não é opcional.
-- Feedback de clique: `active:scale-[0.98]` em botões primários e links de ação (não em texto puramente informativo).
-
-### 7.7. Padrões textuais
-- Divisor "ou" entre formulário e CTA secundário: duas linhas finas (`bg-white/10`) + label central uppercase em `text-text-quaternario`.
-- Transição para ação secundária (ex.: "Não tem conta? Criar conta grátis"): frase em `text-text-terciario` + link em `text-marca` com `hover:text-marca-hover` — nunca um botão de mesmo peso visual que o CTA primário.
-- Copy de telas de entrada (headline/promessa) evita tom de anúncio/ad ("perca X, ganhe Y") — usa tom de autoridade tranquila, coerente com a vigilância 24h do produto, não com conversão agressiva de tráfego pago.
+- **Camada Global** (`/projetos`, fora de `AppLayout`): lista de projetos do usuário/agência, criação/conexão de novo projeto. Vive fora da sidebar/header de projeto — tem seu próprio header minimalista (logo + ação de sair).
+- **Camada de Projeto** (`/`, `/aprovacoes`, `/configuracoes`, dentro de `AppLayout` + `AppSidebar`): tudo escopado a **um projeto = uma conta de anúncios conectada** (ex.: uma conta Meta Ads por projeto, nunca compartilhada entre projetos).
+- **Projeto atual** é estado de aplicação centralizado em `app/use-projeto-atual.tsx` (Context API, mesmo padrão de `use-theme.tsx`) — nenhuma página mais guarda esse estado localmente.
+- **Caminho de volta:** o dropdown de projeto no header (`app-layout.tsx`) tem, abaixo da lista de projetos e de um separador, o item "Ver todos os projetos", que navega para `/projetos`. Este é o único ponto de entrada/saída entre as duas camadas.
 
 ---
 
 ## 8. O que ainda falta decidir / validar
-- Versão em modo claro (se algum dia for necessária) — a V1 tinha tokens de claro prontos; a V2 ainda não foi adaptada para claro, pois a direção escolhida foi escuro como padrão.
-- Telas de Diagnóstico, Relatórios e Conexão de conta ainda não foram desenhadas nesta linguagem — aplicar os mesmos princípios quando chegarem.
-- Iconografia: usei Tabler outline nos mockups do painel (ti-bell, ti-chevron-right, ti-dots, ti-plus), mas a tela de Login real foi implementada com Lucide — decidir qual biblioteca é definitiva e unificar.
-- Microinterações / estados de hover, foco, loading **do painel interno** ainda não foram formalizados (a seção 7 cobre apenas telas de entrada).
-- Se o "Reveal cinematográfico" (7.3) e o botão de marca (7.5) devem se estender a outras telas públicas (cadastro, recuperação de senha) ou são exclusivos da tela de login.
-- Estado "Em construção" das telas placeholder de Aprovações/Configurações (seção 5.5) ainda é genérico — refinar copy quando essas telas começarem a ser desenhadas de verdade.
+
+- Telas de Aprovações e Configurações ainda são placeholder ("Em construção") — ainda não desenhadas nesta linguagem.
+- Conexão real com a API do Meta Ads (OAuth ou token manual) — o modal de criar projeto hoje é mock, sem chamada real ao backend.
+- Tema de telas de entrada (login) pode ter divergido visualmente do painel após esta reescrita — revalidar consistência entre `login-page.tsx` e os tokens atuais antes de considerar o conjunto unificado.
+- Billing/configurações da camada Global ainda não têm tela — só a lista de projetos foi implementada.
