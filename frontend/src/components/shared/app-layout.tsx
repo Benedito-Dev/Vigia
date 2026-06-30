@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ChevronDown, LogOut, Moon, Sun, LayoutList } from 'lucide-react'
+import { Check, ChevronDown, Folder, LogOut, Moon, Sun } from 'lucide-react'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -34,19 +34,26 @@ export function AppLayout({ children }: AppLayoutProps) {
               {projetoAtual.clienteNome}
               <ChevronDown className="size-3.5 text-text-terciario" />
             </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              {projetosMock.map((projeto) => (
-                <DropdownMenuItem
-                  key={projeto.id}
-                  onClick={() => selecionarProjeto(projeto)}
-                  className="cursor-pointer"
-                >
-                  {projeto.clienteNome}
-                </DropdownMenuItem>
-              ))}
+            <DropdownMenuContent className="w-56 p-1.5">
+              {projetosMock.map((projeto) => {
+                const ativo = projeto.id === projetoAtual.id
+                return (
+                  <DropdownMenuItem
+                    key={projeto.id}
+                    onClick={() => selecionarProjeto(projeto)}
+                    className="cursor-pointer justify-between rounded-md px-2.5 py-2 text-sm"
+                  >
+                    {projeto.clienteNome}
+                    {ativo && <Check className="size-3.5 text-marca-texto" />}
+                  </DropdownMenuItem>
+                )
+              })}
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => navigate('/projetos')} className="cursor-pointer">
-                <LayoutList className="size-3.5" />
+              <DropdownMenuItem
+                onClick={() => navigate('/projetos')}
+                className="cursor-pointer gap-2 rounded-md px-2.5 py-2 text-sm text-text-terciario"
+              >
+                <Folder className="size-3.5" />
                 Ver todos os projetos
               </DropdownMenuItem>
             </DropdownMenuContent>
