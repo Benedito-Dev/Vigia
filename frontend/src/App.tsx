@@ -7,6 +7,7 @@ import { ConfiguracoesPage } from '@/pages/configuracoes/configuracoes-page'
 import { ProjetosPage } from '@/pages/projetos/projetos-page'
 import { EquipePage } from '@/pages/equipe/equipe-page'
 import { RotaPrivada } from '@/app/rota-privada'
+import { RotaComProjeto } from '@/app/rota-com-projeto'
 import { ProjetoAtualProvider } from '@/app/use-projeto-atual'
 import { SidebarShell } from '@/components/shared/sidebar-shell'
 
@@ -17,6 +18,7 @@ function AppShell() {
   return (
     <div className="flex min-h-svh">
       {exibirSidebar && <SidebarShell />}
+      <div className="min-h-svh min-w-0 flex-1">
       <Routes>
         <Route path="/login" element={<LoginPage />} />
         <Route
@@ -31,7 +33,9 @@ function AppShell() {
           path="/"
           element={
             <RotaPrivada>
-              <DashboardPage />
+              <RotaComProjeto>
+                <DashboardPage />
+              </RotaComProjeto>
             </RotaPrivada>
           }
         />
@@ -47,7 +51,9 @@ function AppShell() {
           path="/campanhas"
           element={
             <RotaPrivada>
-              <CampanhasPage />
+              <RotaComProjeto>
+                <CampanhasPage />
+              </RotaComProjeto>
             </RotaPrivada>
           }
         />
@@ -55,7 +61,9 @@ function AppShell() {
           path="/aprovacoes"
           element={
             <RotaPrivada>
-              <AprovacoesPage />
+              <RotaComProjeto>
+                <AprovacoesPage />
+              </RotaComProjeto>
             </RotaPrivada>
           }
         />
@@ -63,11 +71,14 @@ function AppShell() {
           path="/configuracoes"
           element={
             <RotaPrivada>
-              <ConfiguracoesPage />
+              <RotaComProjeto>
+                <ConfiguracoesPage />
+              </RotaComProjeto>
             </RotaPrivada>
           }
         />
       </Routes>
+      </div>
     </div>
   )
 }

@@ -6,7 +6,7 @@ import { KpiCard } from '@/components/shared/kpi-card'
 import type { EstadoStatus } from '@/components/shared/linha-status'
 import { resumoPorPeriodoMock, rotuloPeriodo, type Periodo } from '@/features/dashboard/dados-mock'
 import { cn } from '@/lib/utils'
-import { useProjetoAtual } from '@/app/use-projeto-atual'
+import { useProjetoSelecionado } from '@/app/use-projeto-atual'
 
 const periodos: Periodo[] = ['hoje', '7d', 'mes']
 
@@ -25,7 +25,7 @@ const corTextoPorEstado: Record<EstadoStatus, string> = {
 }
 
 export function DashboardPage() {
-  const { projetoAtual } = useProjetoAtual()
+  const projetoAtual = useProjetoSelecionado()
   const [periodo, setPeriodo] = useState<Periodo>('hoje')
   const [carregando, setCarregando] = useState(false)
 

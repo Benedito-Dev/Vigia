@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { PrismaModule } from './prisma/prisma.module';
+import { CofreModule } from './common/cofre/cofre.module';
 import { AuthModule } from './auth/auth.module';
 import { OrganizacoesModule } from './organizacoes/organizacoes.module';
 import { ProjetosModule } from './projetos/projetos.module';
@@ -20,6 +21,7 @@ import { MetaAdsModule } from './integracoes/meta-ads/meta-ads.module';
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     PrismaModule,
+    CofreModule,
     AuditoriaModule,
     MetaAdsModule,
     AuthModule,

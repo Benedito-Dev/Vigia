@@ -8,7 +8,8 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { VigiaLogo } from '@/components/shared/vigia-logo'
-import { projetosMock } from '@/features/dashboard/dados-mock'
+import { useProjetos } from '@/features/projetos/use-projetos'
+import { mapearProjeto } from '@/features/projetos/mapear-projeto'
 import { useProjetoAtual } from '@/app/use-projeto-atual'
 import { cn } from '@/lib/utils'
 
@@ -22,6 +23,12 @@ const itensNavegacao = [
 export function AppSidebar() {
   const navigate = useNavigate()
   const { projetoAtual, selecionarProjeto } = useProjetoAtual()
+  const { data: projetosApi } = useProjetos()
+  const projetos = (projetosApi ?? []).map(mapearProjeto)
+
+  // A SidebarShell monta esta sidebar mesmo na camada Global (fora de tela).
+  // Sem projeto selecionado, não há o que mostrar aqui.
+  if (!projetoAtual) return null
 
   return (
     <aside className="relative flex h-svh w-64 shrink-0 flex-col overflow-hidden border-r border-border px-4 py-6">
@@ -41,7 +48,7 @@ export function AppSidebar() {
             <ChevronDown className="ml-auto size-3.5 shrink-0 text-text-terciario" />
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-56 p-1.5">
-            {projetosMock.map((projeto) => {
+            {projetos.map((projeto) => {
               const ativo = projeto.id === projetoAtual.id
               return (
                 <DropdownMenuItem

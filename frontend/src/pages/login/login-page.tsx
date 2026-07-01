@@ -18,7 +18,7 @@ export function LoginPage() {
     event.preventDefault()
     login.mutate(
       { email, senha },
-      { onSuccess: () => navigate('/') },
+      { onSuccess: () => navigate('/projetos') },
     )
   }
 

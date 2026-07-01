@@ -1,4 +1,5 @@
-import { useState, type FormEvent } from 'react'
+import { useEffect, useState, type FormEvent } from 'react'
+import { Loader2 } from 'lucide-react'
 import {
   Dialog,
   DialogContent,
@@ -18,13 +19,26 @@ interface CriarProjetoDialogProps {
   trigger: React.ReactNode
   onCriar: (dados: { clienteNome: string; nicho: string; externalId: string; accessToken: string }) => void
   projeto?: ProjetoResumo
+  /** Estado assíncrono opcional: quando fornecido, o dialog só fecha no sucesso. */
+  carregando?: boolean
+  erro?: string | null
+  /** Sinaliza sucesso para o dialog fechar (muda de false→true). */
+  concluido?: boolean
 }
 
 const camposIniciais = { clienteNome: '', nicho: '', externalId: '', accessToken: '' }
 
-export function CriarProjetoDialog({ trigger, onCriar, projeto }: CriarProjetoDialogProps) {
+export function CriarProjetoDialog({
+  trigger,
+  onCriar,
+  projeto,
+  carregando = false,
+  erro = null,
+  concluido,
+}: CriarProjetoDialogProps) {
   const modoEdicao = Boolean(projeto)
   const [open, setOpen] = useState(false)
+  const assincrono = carregando !== undefined || erro !== undefined
   const [campos, setCampos] = useState(
     projeto
       ? { clienteNome: projeto.clienteNome, nicho: projeto.nicho, externalId: projeto.conexaoMeta.externalId, accessToken: '' }
@@ -42,13 +56,21 @@ export function CriarProjetoDialog({ trigger, onCriar, projeto }: CriarProjetoDi
     }
   }
 
+  // Modo assíncrono: o dialog fecha só quando `concluido` vira true (sucesso).
+  useEffect(() => {
+    if (concluido) {
+      if (!modoEdicao) setCampos(camposIniciais)
+      setOpen(false)
+    }
+  }, [concluido, modoEdicao])
+
   function handleSubmit(event: FormEvent) {
     event.preventDefault()
     onCriar(campos)
-    if (!modoEdicao) {
-      setCampos(camposIniciais)
+    if (!assincrono) {
+      if (!modoEdicao) setCampos(camposIniciais)
+      setOpen(false)
     }
-    setOpen(false)
   }
 
   // Em reconexão, sinaliza quando o usuário aponta o projeto para outra conta.
@@ -140,19 +162,34 @@ export function CriarProjetoDialog({ trigger, onCriar, projeto }: CriarProjetoDi
             />
           </div>
 
+          {erro && (
+            <p className="rounded-lg bg-status-critico/10 px-3.5 py-2.5 text-xs text-status-critico-texto">
+              {erro}
+            </p>
+          )}
+
           <DialogFooter>
             <button
               type="button"
               onClick={() => setOpen(false)}
-              className="cursor-pointer rounded-lg px-3.5 py-2 text-sm font-medium text-text-terciario transition-colors hover:bg-muted hover:text-foreground"
+              disabled={carregando}
+              className="cursor-pointer rounded-lg px-3.5 py-2 text-sm font-medium text-text-terciario transition-colors hover:bg-muted hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50"
             >
               Cancelar
             </button>
             <button
               type="submit"
-              className="cursor-pointer rounded-lg bg-marca px-3.5 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+              disabled={carregando}
+              className="flex cursor-pointer items-center gap-2 rounded-lg bg-marca px-3.5 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
             >
-              {contaTrocada ? 'Trocar conta' : modoEdicao ? 'Reconectar' : 'Conectar e criar'}
+              {carregando && <Loader2 className="size-4 animate-spin" />}
+              {carregando
+                ? 'Validando na Meta…'
+                : contaTrocada
+                  ? 'Trocar conta'
+                  : modoEdicao
+                    ? 'Reconectar'
+                    : 'Conectar e criar'}
             </button>
           </DialogFooter>
         </form>

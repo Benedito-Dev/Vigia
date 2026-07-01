@@ -29,7 +29,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { useProjetoAtual } from '@/app/use-projeto-atual'
+import { useProjetoAtual, useProjetoSelecionado } from '@/app/use-projeto-atual'
 import { nichosDisponiveis, rotuloDaFaixaDeTicket } from '@/features/projetos/catalogo-benchmark'
 import { resumoPorPeriodoMock } from '@/features/dashboard/dados-mock'
 import { cn } from '@/lib/utils'
@@ -71,7 +71,8 @@ function rotuloSync(referencia: Date, agora = new Date()) {
 
 export function ConfiguracoesPage() {
   const navigate = useNavigate()
-  const { projetoAtual, atualizarProjeto } = useProjetoAtual()
+  const projetoAtual = useProjetoSelecionado()
+  const { atualizarProjeto } = useProjetoAtual()
   const { conexaoMeta } = projetoAtual
   const conectado = conexaoMeta.status === 'conectado'
 

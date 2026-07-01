@@ -1,9 +1,11 @@
-import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ArrowRight, LogOut, Moon, Plus, Sun } from 'lucide-react'
+import { ArrowRight, Loader2, LogOut, Moon, Plus, Sun, TriangleAlert } from 'lucide-react'
 import { logout } from '@/features/auth/use-auth'
 import { CriarProjetoDialog } from '@/features/projetos/criar-projeto-dialog'
-import { projetosMock as projetosMockIniciais, type ProjetoResumo } from '@/features/dashboard/dados-mock'
+import { useProjetos, useConectarProjeto } from '@/features/projetos/use-projetos'
+import { mapearProjeto } from '@/features/projetos/mapear-projeto'
+import { extrairMensagemDeErro } from '@/features/auth/use-login'
+import type { ProjetoResumo } from '@/features/dashboard/dados-mock'
 import { useProjetoAtual } from '@/app/use-projeto-atual'
 import { useTheme } from '@/app/use-theme'
 import { VigiaLogo } from '@/components/shared/vigia-logo'
@@ -12,37 +14,61 @@ export function ProjetosPage() {
   const navigate = useNavigate()
   const { tema, alternarTema } = useTheme()
   const { selecionarProjeto } = useProjetoAtual()
-  const [projetos, setProjetos] = useState<ProjetoResumo[]>(projetosMockIniciais)
+  const { data, isLoading, isError, error, refetch } = useProjetos()
+  const conectar = useConectarProjeto()
+
+  const projetos = (data ?? []).map(mapearProjeto)
 
   function abrirProjeto(projeto: ProjetoResumo) {
     selecionarProjeto(projeto)
     navigate('/')
   }
 
-  function criarProjeto(dados: { clienteNome: string; nicho: string; externalId: string }) {
-    const novoProjeto: ProjetoResumo = {
-      id: `proj-${Date.now()}`,
-      clienteNome: dados.clienteNome,
-      nicho: dados.nicho,
-      ticketMedio: 0,
-      investidoMes: 0,
-      roasMedio: 0,
-      campanhasAtivas: 0,
-      campanhasEmDesvio: 0,
-      conexaoMeta: {
-        status: 'conectado',
+  function criarProjeto(dados: {
+    clienteNome: string
+    nicho: string
+    externalId: string
+    accessToken: string
+  }) {
+    conectar.mutate(
+      {
+        clienteNome: dados.clienteNome,
+        nicho: dados.nicho,
         externalId: dados.externalId,
-        conectadoEm: new Date().toISOString().slice(0, 10),
+        accessToken: dados.accessToken,
       },
-      limiteSeguranca: {
-        tetoVerbaDiaria: 0,
-        cplMaximo: 0,
-        escalaMaxPctDia: 20,
-        atualizadoEm: new Date().toISOString().slice(0, 10),
+      {
+        onSuccess: (novo) => abrirProjeto(mapearProjeto(novo)),
       },
-    }
-    setProjetos((atuais) => [...atuais, novoProjeto])
-    abrirProjeto(novoProjeto)
+    )
+  }
+
+  if (isLoading) {
+    return (
+      <div className="flex-1">
+        <div className="flex h-svh items-center justify-center text-text-terciario">
+          <Loader2 className="size-5 animate-spin" />
+        </div>
+      </div>
+    )
+  }
+
+  if (isError) {
+    return (
+      <div className="flex-1">
+        <div className="mx-auto mt-24 flex max-w-md flex-col items-center gap-3 text-center">
+          <TriangleAlert className="size-6 text-status-critico-texto" />
+          <p className="text-sm text-text-terciario">{extrairMensagemDeErro(error)}</p>
+          <button
+            type="button"
+            onClick={() => refetch()}
+            className="cursor-pointer rounded-lg border border-border px-3.5 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted"
+          >
+            Tentar novamente
+          </button>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -83,6 +109,9 @@ export function ProjetosPage() {
                 </div>
                 <CriarProjetoDialog
                   onCriar={criarProjeto}
+                  carregando={conectar.isPending}
+                  erro={conectar.isError ? extrairMensagemDeErro(conectar.error) : null}
+                  concluido={conectar.isSuccess}
                   trigger={
                     <button
                       type="button"
@@ -101,6 +130,9 @@ export function ProjetosPage() {
 
                 <CriarProjetoDialog
                   onCriar={criarProjeto}
+                  carregando={conectar.isPending}
+                  erro={conectar.isError ? extrairMensagemDeErro(conectar.error) : null}
+                  concluido={conectar.isSuccess}
                   trigger={
                     <button
                       type="button"
@@ -126,6 +158,9 @@ export function ProjetosPage() {
               <div className="mt-5 flex justify-center">
                 <CriarProjetoDialog
                   onCriar={criarProjeto}
+                  carregando={conectar.isPending}
+                  erro={conectar.isError ? extrairMensagemDeErro(conectar.error) : null}
+                  concluido={conectar.isSuccess}
                   trigger={
                     <button
                       type="button"

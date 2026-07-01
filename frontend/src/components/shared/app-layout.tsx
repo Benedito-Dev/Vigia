@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { Folder, LogOut, Moon, Sun } from 'lucide-react'
 import { logout } from '@/features/auth/use-auth'
 import { useTheme } from '@/app/use-theme'
-import { useProjetoAtual } from '@/app/use-projeto-atual'
+import { useProjetoSelecionado } from '@/app/use-projeto-atual'
 
 interface AppLayoutProps {
   children: ReactNode
@@ -12,7 +12,7 @@ interface AppLayoutProps {
 export function AppLayout({ children }: AppLayoutProps) {
   const navigate = useNavigate()
   const { tema, alternarTema } = useTheme()
-  const { projetoAtual } = useProjetoAtual()
+  const projetoAtual = useProjetoSelecionado()
 
   return (
     <div className="flex-1">
