@@ -126,8 +126,32 @@ model Usuario {
 
   organizacao        Organizacao @relation(fields: [organizacaoId], references: [id])
   aprovacoesDecididas Aprovacao[] @relation("DecididoPor")
+  refreshTokens       RefreshToken[]
 
   @@map("usuario")
+}
+
+// Sessão de longa duração (refresh token JWT). Nunca guardamos o token cru —
+// apenas o hash SHA-256 (tokenHash). Cada rotação encadeia os registros pela
+// familiaId; reapresentar um refresh já revogado revoga a família inteira
+// (detecção de reúso, padrão OWASP). Ver workspace/plans/refresh-token-jwt.md.
+model RefreshToken {
+  id             String    @id @default(uuid())
+  usuarioId      String    @map("usuario_id")
+  tokenHash      String    @map("token_hash")
+  familiaId      String    @map("familia_id")
+  expiraEm       DateTime  @map("expira_em")
+  revogadoEm     DateTime? @map("revogado_em")
+  substituidoPor String?   @map("substituido_por")
+  userAgent      String?   @map("user_agent")
+  criadoEm       DateTime  @default(now()) @map("criado_em")
+
+  usuario        Usuario @relation(fields: [usuarioId], references: [id])
+
+  @@index([usuarioId])
+  @@index([familiaId])
+  @@index([tokenHash])
+  @@map("refresh_token")
 }
 
 model Projeto {
