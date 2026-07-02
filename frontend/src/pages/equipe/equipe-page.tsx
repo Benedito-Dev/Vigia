@@ -23,7 +23,7 @@ export function EquipePage() {
         <button
           type="button"
           onClick={() => {
-            logout()
+            void logout()
             navigate('/login')
           }}
           className="cursor-pointer rounded-lg p-2 text-text-terciario transition-colors hover:bg-muted hover:text-foreground"

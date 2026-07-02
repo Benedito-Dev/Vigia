@@ -12,6 +12,11 @@ export interface LoginResponse {
   usuario: Usuario
 }
 
+/** Corpo de POST /auth/refresh — só o access token novo; o refresh volta no cookie. */
+export interface RefreshResponse {
+  access_token: string
+}
+
 export interface ApiErrorBody {
   error: {
     code: number
